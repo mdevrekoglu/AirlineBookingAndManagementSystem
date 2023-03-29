@@ -40,4 +40,28 @@ public class user {
     public int getUserType(){
         return userType;
     }
+
+    public void setName(String name){
+        this.name = name;
+    }
+
+    public void setSurname(String surname){
+        this.surname = surname;
+    }
+
+    public void setMail(String mail){
+        this.mail = mail;
+    }
+
+    public void setPhoneNumber(String phoneNumber){
+        this.phoneNumber = phoneNumber;
+    }
+
+    public void setPassword(String password){
+        this.password = password;
+    }
+
+    public void setUserType(int userType){
+        this.userType = userType;
+    }
 }
