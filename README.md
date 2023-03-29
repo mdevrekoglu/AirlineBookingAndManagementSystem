@@ -1,2 +1,2 @@
-# AirlineBookingSystem
+# AirlineBookingAndManagementSystem
 CME2210-Spring-Project
