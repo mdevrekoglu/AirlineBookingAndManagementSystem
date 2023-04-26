@@ -1,4 +1,7 @@
+import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.JobAttributes;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -9,6 +12,8 @@ import java.io.FileWriter;
 import java.io.ObjectOutputStream;
 import java.nio.Buffer;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -17,7 +22,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
-public class op {
+public class op  {
 
     // create a string array list
     private static ArrayList<user> users = new ArrayList<user>();
@@ -37,9 +42,36 @@ public class op {
     // User Label and Buttons
     private static JLabel userInfoLabel = new JLabel();
     private static JButton scheduleFlight = new JButton("Schedule Flight");
+    JLabel clockLabel = new JLabel();
+    public void clock(){
+        Thread clock = new Thread(){
+            public void run(){
+                try{
+                    for(;;){
+                        Calendar cal = new GregorianCalendar();
+                        int day = cal.get(Calendar.DAY_OF_MONTH);
+                        int month = cal.get((Calendar.MONTH)+1)%12;
+                        int year = cal.get(Calendar.YEAR);
 
+                        int second = cal.get(Calendar.SECOND);
+                        int minute = cal.get(Calendar.MINUTE);
+                        int hour = cal.get(Calendar.HOUR);
+
+                        clockLabel.setText(hour + ":" + minute + ":" + second + "         " + day + "/" + month + "/" + year);
+                        clockLabel.setBounds(200, 400, 200, 50);
+                        frame.getContentPane().add(clockLabel);
+                        clockLabel.setVisible(true);
+                        sleep(1000);
+                    }
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+            }
+        };
+        clock.start();
+    }
     public op() {
-
+        clock();
         userReader();
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -75,7 +107,6 @@ public class op {
 
         logInButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-
                 frame.setEnabled(false);
 
                 JFrame logInFrame = new JFrame("Log In");
@@ -246,27 +277,50 @@ public class op {
                     public void actionPerformed(ActionEvent e) {
 
                         Boolean flag = false;
-
+                        String total_error = "";
                         if (name.getText().equals("") || surname.getText().equals("")
                                 || mail.getText().equals("") || password.getText().equals("")
                                 || phoneNumber.getText().equals("")) {
                             flag = true;
-                            JOptionPane.showMessageDialog(null, "Please fill all the blanks!", "Error",
-                                    JOptionPane.ERROR_MESSAGE);
+                            total_error += "Please fill all the fields!\n";
+
                         }
 
-                        if (!flag) {
-                            for (int i = 0; i < users.size(); i++) {
-                                if (mail.getText().equals(users.get(i).getMail())
-                                        || phoneNumber.getText().equals(users.get(i).getPhoneNumber())) {
-                                    JOptionPane.showMessageDialog(null, "This mail or phone number is already used!",
-                                            "Error", JOptionPane.ERROR_MESSAGE);
-                                    flag = true;
-                                    break;
-                                }
+                        // checking if the mail is valid
+
+                        if (!mail.getText().contains("@gmail.com") && !mail.getText().contains("@hotmail.com")
+                                && !mail.getText().contains("@outlook.com")) {
+                            total_error += "Please enter a valid mail!\n";
+                            flag = true;
+                        }
+
+                        if (phoneNumber.getText().length() != 11 || !phoneNumber.getText().startsWith("0")
+                                || !phoneNumber.getText().matches("[0-9]+")) {
+                            total_error += "Please enter a valid phone number!\n";
+                            flag = true;
+                        }
+
+                        // checking password length
+
+                        if (password.getText().length() < 8) {
+                            total_error += "Password must be at least 8 characters!\n";
+                            flag = true;
+                        }
+
+                        for (int i = 0; i < users.size(); i++) {
+                            if (mail.getText().equals(users.get(i).getMail())
+                                    || phoneNumber.getText().equals(users.get(i).getPhoneNumber())) {
+                                total_error += "This mail or phone number is already used!\n";
+                                flag = true;
+                                break;
                             }
                         }
-
+                        if (flag){
+                            
+                           JOptionPane.showMessageDialog(null, total_error, "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                            
+                        
                         if (!flag) {
                             int type = 0;
                             if (admin.getText().equals("admin")) {
@@ -293,6 +347,7 @@ public class op {
             }
         });
 
+        
         logOutButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -366,16 +421,10 @@ public class op {
                 price.setColumns(10);
 
                 JButton scheduleFlight = new JButton("Schedule Flight");
-                scheduleFlight.setBounds(192, 450, 115, 29);
+                scheduleFlight.setBounds(192, 450, 130, 29);
                 scheduleFlightFrame.getContentPane().add(scheduleFlight);
 
-
-                //10047/Paris-Istanbul/01.04.2023/10:10-12:10/100/120/-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1
-
-
-
-
-
+                // 10047/Paris-Istanbul/01.04.2023/10:10-12:10/100/120/-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1
 
                 scheduleFlightFrame.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
@@ -414,12 +463,14 @@ public class op {
         userInfoLabel.setVisible(true);
         scheduleFlight.setVisible(false);
     }
+   
     // ***************************************************************************************************************************
 
     // Readers and Writers
     // ********************************************************************************************************************
     public static void userReader() {
         // name/surname/mail/password/phone number/usertype(0-> user, 1-> admin)
+
         try {
 
             BufferedReader reader = new BufferedReader(new FileReader(usersFilePath));
@@ -429,8 +480,19 @@ public class op {
             while (line != null) {
                 String[] parts = line.split("/");
 
-                if (parts.length != 6)
+                if (parts.length != 6) {
                     throw new Exception("File is corrupted! (users.txt)");
+                }
+
+                // if same mail is used
+
+                /*
+                 * for (int i = 0; i < users.size(); i++) {
+                 * if (users.get(i).getMail().equals(parts[2])) {
+                 * throw new Exception("Mail is already used!");
+                 * }
+                 * }
+                 */
 
                 user newUser = new user(parts[0], parts[1], parts[2], parts[3], parts[4], Integer.parseInt(parts[5]));
                 users.add(newUser);
