@@ -1,17 +1,5 @@
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.JobAttributes;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.FileOutputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.ObjectOutputStream;
-import java.nio.Buffer;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import javax.swing.JButton;
@@ -25,10 +13,7 @@ import javax.swing.JTextField;
 public class op  {
 
     // create a string array list
-    private static ArrayList<user> users = new ArrayList<user>();
-    private static ArrayList<flight> flights = new ArrayList<flight>();
-    private static String usersFilePath = "users.txt";
-    private static String flightsFilePath = "flights.txt";
+    private MySingleton mySingleton = MySingleton.getInstance();
     private static int loggedInUserIndex = -1;
 
     // Main Frame
@@ -42,6 +27,8 @@ public class op  {
     // User Label and Buttons
     private static JLabel userInfoLabel = new JLabel();
     private static JButton scheduleFlight = new JButton("Schedule Flight");
+
+
     JLabel clockLabel = new JLabel();
     public void clock(){
         Thread clock = new Thread(){
@@ -70,9 +57,9 @@ public class op  {
         };
         clock.start();
     }
+
     public op() {
         clock();
-        userReader();
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(500, 500);
@@ -143,42 +130,36 @@ public class op  {
                 logIn.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
 
-                        Boolean flag = false;
+                        int index = mySingleton.isCustomer(id.getText());
 
-                        for (int i = 0; i < users.size(); i++) {
-                            if ((id.getText().equals(users.get(i).getMail())
-                                    || id.getText().equals(users.get(i).getPhoneNumber()))
-                                    && passport.getText().equals(users.get(i).getPassword())) {
+                        // Check if user exists
+                        if(index != -1){
+                            if(mySingleton.getCustomers().get(index).getPassword().equals(passport.getText())){
+                                loggedInUserIndex = index;
                                 frame.setEnabled(true);
-                                flag = true;
-                                loggedInUserIndex = i;
-
-                                if (users.get(i).getUserType() == 1) {
-                                    adminMenu();
-                                } else if (users.get(i).getUserType() == 0) {
-                                    userMenu();
-                                } else {
-                                    JOptionPane.showMessageDialog(null, "Wrong User Type! Your account is not admin!",
-                                            "Error",
-                                            JOptionPane.ERROR_MESSAGE);
-
-                                    users.get(i).setUserType(0);
-                                    userWriter();
-                                    userMenu();
-                                }
-
-                                JOptionPane.showMessageDialog(null,
-                                        "Welcome " + users.get(i).getName() + " " + users.get(i).getSurname() + "!",
-                                        "Welcome", JOptionPane.INFORMATION_MESSAGE);
-
-                                userInfoLabel.setText(
-                                        "Welcome " + users.get(i).getName() + " " + users.get(i).getSurname() + "!");
-
                                 logInFrame.dispose();
-                            }
-                        }
+                                
+                                // Show welcome message
+                                JOptionPane.showMessageDialog(null, "Welcome " + mySingleton.getCustomers().get(index).getName() + " " + mySingleton.getCustomers().get(index).getSurname(), "Welcome",
+                                    JOptionPane.INFORMATION_MESSAGE);
 
-                        if (!flag) {
+                                // Show user info
+                                userInfoLabel.setText("Welcome " + mySingleton.getCustomers().get(index).getName() + " " + mySingleton.getCustomers().get(index).getSurname());
+
+                                // Show menu depending on user type
+                                if(mySingleton.getCustomers().get(index).getUserType() == 1){
+                                    adminMenu();
+                                }else if(mySingleton.getCustomers().get(index).getUserType() == 0){
+                                    userMenu();
+                                }else{
+                                    userMenu();
+                                    mySingleton.getCustomers().get(index).setUserType(0);
+                                }
+                            }else{
+                                JOptionPane.showMessageDialog(null, "Wrong ID or Password!", "Error",
+                                    JOptionPane.ERROR_MESSAGE);
+                            }
+                        }else{
                             JOptionPane.showMessageDialog(null, "Wrong ID or Password!", "Error",
                                     JOptionPane.ERROR_MESSAGE);
                         }
@@ -272,71 +253,82 @@ public class op  {
                 signUp.setBounds(192, 450, 115, 29);
                 signUpFrame.getContentPane().add(signUp);
 
-                // add the new user to the users array list and close the signUpFrame
+                // When the sign up button is clicked
                 signUp.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-
+                 
                         Boolean flag = false;
                         String total_error = "";
+
+                        // Check if all the fields are filled
                         if (name.getText().equals("") || surname.getText().equals("")
                                 || mail.getText().equals("") || password.getText().equals("")
                                 || phoneNumber.getText().equals("")) {
                             flag = true;
                             total_error += "Please fill all the fields!\n";
-
                         }
 
-                        // checking if the mail is valid
+                        // Check if name and surname contains only letters
+                        if (!name.getText().matches("[a-zA-Z]+") || !surname.getText().matches("[a-zA-Z]+")) {
+                            total_error += "Name and surname must contain only letters!\n";
+                            flag = true;
+                        }
 
+                        // Checking if the mail and phone number is valid
                         if (!mail.getText().contains("@gmail.com") && !mail.getText().contains("@hotmail.com")
-                                && !mail.getText().contains("@outlook.com")) {
+                                && !mail.getText().contains("@outlook.com") && !mail.getText().contains("@yahoo.com")) {
                             total_error += "Please enter a valid mail!\n";
                             flag = true;
                         }
 
+                        // Checking if the phone number is valid
                         if (phoneNumber.getText().length() != 11 || !phoneNumber.getText().startsWith("0")
                                 || !phoneNumber.getText().matches("[0-9]+")) {
                             total_error += "Please enter a valid phone number!\n";
                             flag = true;
                         }
 
-                        // checking password length
-
+                        // Checking password length
                         if (password.getText().length() < 8) {
                             total_error += "Password must be at least 8 characters!\n";
                             flag = true;
                         }
 
-                        for (int i = 0; i < users.size(); i++) {
-                            if (mail.getText().equals(users.get(i).getMail())
-                                    || phoneNumber.getText().equals(users.get(i).getPhoneNumber())) {
-                                total_error += "This mail or phone number is already used!\n";
+                        // Checking if mail unique
+                        for(int i = 0; i < mySingleton.getCustomerSize(); i++){
+                            if(mySingleton.getCustomerByIndex(i).getMail().equals(mail.getText())){
+                                total_error += "This mail is already used!\n";
                                 flag = true;
                                 break;
                             }
                         }
-                        if (flag){
-                            
-                           JOptionPane.showMessageDialog(null, total_error, "Error", JOptionPane.ERROR_MESSAGE);
-                        }
-                            
-                        
-                        if (!flag) {
-                            int type = 0;
-                            if (admin.getText().equals("admin")) {
-                                type = 1;
-                            }
 
-                            users.add(new user(name.getText(), surname.getText(), mail.getText(), password.getText(),
-                                    phoneNumber.getText(), type));
+                        // Checking if phone number unique
+                        for(int i = 0; i < mySingleton.getCustomerSize(); i++){
+                            if(mySingleton.getCustomerByIndex(i).getPhoneNumber().equals(phoneNumber.getText())){
+                                total_error += "This phone number is already used!\n";
+                                flag = true;
+                                break;
+                            }
+                        }
+
+                        // Checking if admin password is correct
+                        if(flag){
+                            JOptionPane.showMessageDialog(null, total_error, "Error", JOptionPane.ERROR_MESSAGE);
+                        }else{
+
+                            mySingleton.addCustomer(new customer(name.getText(), surname.getText(), mail.getText(), password.getText(),
+                                    phoneNumber.getText(), admin.getText().equals("admin") ? 1 : 0));
+
                             signUpFrame.dispose();
                             frame.setEnabled(true);
-                            userWriter();
+
+                            JOptionPane.showMessageDialog(null, "You have successfully signed up!", "Success", JOptionPane.INFORMATION_MESSAGE);
                         }
                     }
                 });
 
-                // when the signUpFrame is closed, the main frame will be enabled
+                // When the signUpFrame is closed, the main frame will be enabled
                 signUpFrame.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent windowEvent) {
@@ -347,7 +339,6 @@ public class op  {
             }
         });
 
-        
         logOutButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -465,122 +456,4 @@ public class op  {
     }
    
     // ***************************************************************************************************************************
-
-    // Readers and Writers
-    // ********************************************************************************************************************
-    public static void userReader() {
-        // name/surname/mail/password/phone number/usertype(0-> user, 1-> admin)
-
-        try {
-
-            BufferedReader reader = new BufferedReader(new FileReader(usersFilePath));
-
-            // Read all file and assign to users array list
-            String line = reader.readLine();
-            while (line != null) {
-                String[] parts = line.split("/");
-
-                if (parts.length != 6) {
-                    throw new Exception("File is corrupted! (users.txt)");
-                }
-
-                // if same mail is used
-
-                /*
-                 * for (int i = 0; i < users.size(); i++) {
-                 * if (users.get(i).getMail().equals(parts[2])) {
-                 * throw new Exception("Mail is already used!");
-                 * }
-                 * }
-                 */
-
-                user newUser = new user(parts[0], parts[1], parts[2], parts[3], parts[4], Integer.parseInt(parts[5]));
-                users.add(newUser);
-
-                line = reader.readLine();
-            }
-
-            reader.close();
-        } catch (Exception e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-            System.exit(0);
-        }
-    }
-
-    public static void userWriter() {
-        try {
-            // name/surname/mail/password/phone number/usertype(0-> user, 1-> admin)
-
-            FileWriter myWriter = new FileWriter("users.txt");
-            for (int i = 0; i < users.size(); i++) {
-                myWriter.write(users.get(i).getName() + "/" + users.get(i).getSurname() + "/"
-                        + users.get(i).getMail() + "/" + users.get(i).getPassword() + "/"
-                        + users.get(i).getPhoneNumber() + "/" + users.get(i).getUserType() + "\n");
-            }
-            myWriter.close();
-        } catch (Exception e2) {
-            e2.printStackTrace();
-        }
-    }
-
-    public static void flightWriter() {
-        // flightNo/flightDestination/flightDate/flightTime/price/availableSeats/flightSeats
-        try {
-            FileWriter myWriter = new FileWriter("flights.txt");
-            for (int i = 0; i < flights.size(); i++) {
-                myWriter.write(flights.get(i).getFlightNo() + "/" + flights.get(i).getFlightDestination() + "/"
-                        + flights.get(i).getFlightDate() + "/" + flights.get(i).getFlightTime() + "/"
-                        + flights.get(i).getPrice() + "/" + flights.get(i).getAvailableSeats() + "/");
-
-                for (int j = 0; j < 120; j++) {
-                    if (j == 119)
-                        myWriter.write(flights.get(i).getFlightSeats()[j] + "\n");
-                    else
-                        myWriter.write(flights.get(i).getFlightSeats()[j] + ";");
-                }
-            }
-            myWriter.close();
-        } catch (Exception e1) {
-            e1.printStackTrace();
-            System.exit(0);
-        }
-
-    }
-
-    public static void flightReader() {
-        // flightNo/flightDestination/flightDate/flightTime/price/availableSeats/flightSeats
-        try {
-
-            BufferedReader reader = new BufferedReader(new FileReader(flightsFilePath));
-
-            // Read all file and assign to users array list
-            String line = reader.readLine();
-            while (line != null) {
-                String[] parts = line.split("/");
-
-                if (parts.length != 7)
-                    throw new Exception("File is corrupted! (flights.txt)");
-
-                String[] seats = parts[6].split(";");
-                int[] seatsInt = new int[120];
-                for (int i = 0; i < seats.length; i++) {
-                    seatsInt[i] = Integer.parseInt(seats[i]);
-                }
-
-                flight newFlight = new flight(Integer.parseInt(parts[0]), parts[1], parts[2], parts[3],
-                        Integer.parseInt(parts[4]), Integer.parseInt(parts[5]), seatsInt);
-                flights.add(newFlight);
-
-                line = reader.readLine();
-            }
-
-            reader.close();
-        } catch (Exception e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-            System.exit(0);
-        }
-    }
-    // ****************************************************************************************************************************************
 }

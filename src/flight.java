@@ -1,7 +1,5 @@
 public class flight {
     
-    // flightNo/flightDestination/day.month.year/hour:minute/flightCapacity/availableSeats/........
-    // All flights has 120 seats
     int flightNo;
     String flightDestination;
     String flightDate;

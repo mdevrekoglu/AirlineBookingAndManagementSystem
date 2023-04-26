@@ -1,6 +1,5 @@
-public class user {
-    // name,surname,mail,password,phone number,usertype(0-> user, 1-> admin)
-
+public class customer {
+    
     private String name;
     private String surname;
     private String mail;
@@ -8,7 +7,7 @@ public class user {
     private String phoneNumber;
     private int userType;
 
-    public user(String name, String surname, String mail, String password, String phoneNumber, int userType) {
+    public customer(String name, String surname, String mail, String password, String phoneNumber, int userType) {
         this.name = name;
         this.surname = surname;
         this.mail = mail;
