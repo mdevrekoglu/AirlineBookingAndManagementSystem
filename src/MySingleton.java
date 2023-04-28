@@ -109,7 +109,14 @@ public class MySingleton {
             String line = reader.readLine();
             while (line != null) {
                 String[] parts = line.split("/");
-                customers.add(new customer(parts[0], parts[1], parts[2], parts[3], parts[4], Integer.parseInt(parts[5])));
+                String[] str = parts[6].split(";");
+
+                ArrayList<Integer> flights = new ArrayList<Integer>();
+                for(int i = 0; i < str.length; i++){
+                    flights.add(Integer.parseInt(str[i]));
+                }
+
+                customers.add(new customer(parts[0], parts[1], parts[2], parts[3], parts[4], Integer.parseInt(parts[5]), flights));
                 line = reader.readLine();
             }
 
@@ -127,9 +134,17 @@ public class MySingleton {
         try {          
             FileWriter myWriter = new FileWriter(customersFilePath);
             for (int i = 0; i < customers.size(); i++) {
+                ArrayList<Integer> flights = customers.get(i).getFlights();
+
+                String str = "";
+                for(int j = 0; j < flights.size(); j++){
+                    str += flights.get(j) + ((j == flights.size() - 1) ? "" : ";");
+                }
+
                 myWriter.write(customers.get(i).getName() + "/" + customers.get(i).getSurname() + "/"
                         + customers.get(i).getMail() + "/" + customers.get(i).getPassword() + "/"
-                        + customers.get(i).getPhoneNumber() + "/" + customers.get(i).getUserType() + "\n");
+                        + customers.get(i).getPhoneNumber() + "/" + customers.get(i).getUserType() + "/" 
+                        + (str.equals("") ? ";" : str) + "\n");
             }
 
             myWriter.close();
@@ -192,7 +207,6 @@ public class MySingleton {
             e2.printStackTrace();
             System.exit(0);
         }
-
     }
 
 }

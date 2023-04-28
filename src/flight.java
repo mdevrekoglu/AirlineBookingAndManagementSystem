@@ -1,12 +1,12 @@
 public class flight {
     
-    int flightNo;
-    String flightDestination;
-    String flightDate;
-    String flightTime;
-    int price;
-    int availableSeats;
-    int[] flightSeats;
+    private int flightNo;
+    private String flightDestination;
+    private String flightDate;
+    private String flightTime;
+    private int price;
+    private int availableSeats;
+    private int[] flightSeats;
 
     public flight(int flightNo, String flightDestination, String flightDate, String flightTime, int price, int availableSeats, int[] flightSeats) {
         this.flightNo = flightNo;

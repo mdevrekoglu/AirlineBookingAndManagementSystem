@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class customer {
     
     private String name;
@@ -6,14 +8,16 @@ public class customer {
     private String password;
     private String phoneNumber;
     private int userType;
+    private ArrayList<Integer> flights;
 
-    public customer(String name, String surname, String mail, String password, String phoneNumber, int userType) {
+    public customer(String name, String surname, String mail, String password, String phoneNumber, int userType, ArrayList<Integer> flights) {
         this.name = name;
         this.surname = surname;
         this.mail = mail;
         this.password = password;
         this.phoneNumber = phoneNumber;
         this.userType = userType;
+        this.flights = flights;
     }
 
     public String getName(){
@@ -62,5 +66,13 @@ public class customer {
 
     public void setUserType(int userType){
         this.userType = userType;
+    }
+
+    public ArrayList<Integer> getFlights(){
+        return flights;
+    }
+
+    public void setFlights(ArrayList<Integer> flights){
+        this.flights = flights;
     }
 }

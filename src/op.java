@@ -1,5 +1,6 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import javax.swing.JButton;
@@ -317,8 +318,9 @@ public class op  {
                             JOptionPane.showMessageDialog(null, total_error, "Error", JOptionPane.ERROR_MESSAGE);
                         }else{
 
-                            mySingleton.addCustomer(new customer(name.getText(), surname.getText(), mail.getText(), password.getText(),
-                                    phoneNumber.getText(), admin.getText().equals("admin") ? 1 : 0));
+                            // Creating a new customer
+                            mySingleton.addCustomer(new customer(name.getText(), surname.getText(), mail.getText(), password.getText(), phoneNumber.getText(), 
+                            admin.getText().equals("admin") ? 1 : 0, new ArrayList<Integer>()));
 
                             signUpFrame.dispose();
                             frame.setEnabled(true);
