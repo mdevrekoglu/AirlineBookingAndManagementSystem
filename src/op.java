@@ -22,6 +22,7 @@ public class op  {
 
     // Main Menu Buttons
     private static JButton logInButton = new JButton("Log In");
+    
     private static JButton signUpButton = new JButton("Sign Up");
     private static JButton logOutButton = new JButton("Log Out");
 
