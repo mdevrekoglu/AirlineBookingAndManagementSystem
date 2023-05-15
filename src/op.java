@@ -77,7 +77,7 @@ public class op  {
         frame.getContentPane().add(signUpButton);
         signUpButton.setVisible(false);
 
-        // place it left down corner
+        // place it left up corner
         logOutButton.setBounds(0, 0, 90, 30);
         frame.getContentPane().add(logOutButton);
         logOutButton.setVisible(false);
@@ -277,8 +277,9 @@ public class op  {
                         }
 
                         // Checking if the mail and phone number is valid
-                        if (!mail.getText().contains("@gmail.com") && !mail.getText().contains("@hotmail.com")
-                                && !mail.getText().contains("@outlook.com") && !mail.getText().contains("@yahoo.com")) {
+                        mail.setText(mail.getText().replaceAll(" ", ""));
+                        if (!mail.getText().endsWith("@gmail.com") && !mail.getText().endsWith("@hotmail.com")
+                                && !mail.getText().endsWith("@outlook.com") && !mail.getText().endsWith("@yahoo.com")) {
                             total_error += "Please enter a valid mail!\n";
                             flag = true;
                         }
