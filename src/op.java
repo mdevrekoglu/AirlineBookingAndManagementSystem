@@ -44,13 +44,12 @@ public class op  {
 
                         int second = cal.get(Calendar.SECOND);
                         int minute = cal.get(Calendar.MINUTE);
-                        int hour = cal.get(Calendar.HOUR);
+                        int hour = (cal.get(Calendar.HOUR) + 12) % 24;
 
-                        clockLabel.setText(hour + ":" + minute + ":" + second + "         " + day + "/" + month + "/" + year);
-                        clockLabel.setBounds(200, 400, 200, 50);
-                        frame.getContentPane().add(clockLabel);
-                        clockLabel.setVisible(true);
-                        sleep(1000);
+                        String clock = String.format("%02d:%02d:%02d", hour, minute, second);
+                        String date = String.format("%02d/%02d/%02d", day, month, year);
+                        clockLabel.setText(clock + "   " + date);
+                        sleep(250);
                     }
                 }catch(Exception e){
                     e.printStackTrace();
@@ -61,6 +60,11 @@ public class op  {
     }
 
     public op() {
+
+        clockLabel.setBounds(200, 400, 200, 50);
+        frame.getContentPane().add(clockLabel);
+        clockLabel.setVisible(true);
+
         clock();
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
