@@ -39,17 +39,12 @@ for i in range(10000):
     
     
     # Generate a random date between Jan 1, 2023 and Dec 31, 2023 format should be: 01.01.2023
-    date = f"{random.randint(1, 31):02d}.{random.randint(1, 12):02d}.2023"
+    date = f"2023-{random.randint(1, 12):02d}-{random.randint(1, 28):02d}"
     
     # Generate a random flying time between 1 and 12 hours
     flying_hours = random.randint(1, 12)
     flying_minutes = random.randint(0, 59)
     flying_time = f"{flying_hours:02d}:{flying_minutes:02d}"
-    
-    # Calculate landing time based on flying time
-    landing_hours = (flying_hours + random.randint(1, 3)) % 24
-    landing_minutes = (flying_minutes + random.randint(0, 59)) % 60
-    landing_time = f"{landing_hours:02d}:{landing_minutes:02d}"
     
     # Generate a random price between 50 and 500
     price = random.randint(50, 500)
@@ -61,7 +56,7 @@ for i in range(10000):
     seat_availability = ';'.join(["-1" for i in range(100)])
     
     # Combine all the data into a string in the specified format
-    flight_data = f"{flightNo}/{destination}/{date}/{flying_time}-{landing_time}/{price}/{available_seats}/{seat_availability}"
+    flight_data = f"{flightNo}/{destination}/{date}T{flying_time}/{price}/{available_seats}/{seat_availability}"
     
     # Append the flight data to the list of flights
     flights.append(flight_data)

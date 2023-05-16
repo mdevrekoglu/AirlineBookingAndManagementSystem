@@ -1,14 +1,18 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 
 public class op  {
@@ -18,20 +22,21 @@ public class op  {
     private static int loggedInUserIndex = -1;
 
     // Main Frame
-    private static JFrame frame = new JFrame("APP");
+    private static JFrame frame = new JFrame("Airline Booking and Management System");
 
     // Main Menu Buttons
     private static JButton logInButton = new JButton("Log In");
-    
     private static JButton signUpButton = new JButton("Sign Up");
     private static JButton logOutButton = new JButton("Log Out");
 
+
     // User Label and Buttons
     private static JLabel userInfoLabel = new JLabel();
+    private static JLabel clockLabel = new JLabel();
     private static JButton scheduleFlight = new JButton("Schedule Flight");
+    private static JButton buyTicket = new JButton("Buy Ticket");
 
-
-    JLabel clockLabel = new JLabel();
+    // Clock
     public void clock(){
         Thread clock = new Thread(){
             public void run(){
@@ -44,7 +49,7 @@ public class op  {
 
                         int second = cal.get(Calendar.SECOND);
                         int minute = cal.get(Calendar.MINUTE);
-                        int hour = (cal.get(Calendar.HOUR) + 12) % 24;
+                        int hour = cal.get(Calendar.HOUR_OF_DAY);
 
                         String clock = String.format("%02d:%02d:%02d", hour, minute, second);
                         String date = String.format("%02d/%02d/%02d", day, month, year);
@@ -61,17 +66,19 @@ public class op  {
 
     public op() {
 
+        // Clock Label and Operations
         clockLabel.setBounds(200, 400, 200, 50);
         frame.getContentPane().add(clockLabel);
         clockLabel.setVisible(true);
-
         clock();
 
+        // Button and Label Operations
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(500, 500);
         frame.setLocation(800, 200);
         frame.getContentPane().setLayout(null);
         frame.setVisible(true);
+        frame.setResizable(false);
 
         logInButton.setBounds(200, 100, 100, 50);
         frame.getContentPane().add(logInButton);
@@ -81,25 +88,30 @@ public class op  {
         frame.getContentPane().add(signUpButton);
         signUpButton.setVisible(false);
 
-        // place it left up corner
         logOutButton.setBounds(0, 0, 90, 30);
         frame.getContentPane().add(logOutButton);
         logOutButton.setVisible(false);
 
-        // place userInfoLabel next to logOutButton
         userInfoLabel.setBounds(120, 0, 400, 30);
         frame.getContentPane().add(userInfoLabel);
         userInfoLabel.setVisible(false);
 
-        // place scheduleFlight button unter to userInfoLabel
         scheduleFlight.setBounds(0, 60, 150, 30);
         frame.getContentPane().add(scheduleFlight);
         scheduleFlight.setVisible(false);
 
+        buyTicket.setBounds(160, 100, 150, 30);
+        frame.getContentPane().add(buyTicket);
+        buyTicket.setVisible(false);
+
+        // Main Menu Operations
         mainMenu();
 
+        // If logged in button is clicked
         logInButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                
+                // Set main menu unavailable
                 frame.setEnabled(false);
 
                 JFrame logInFrame = new JFrame("Log In");
@@ -133,14 +145,16 @@ public class op  {
                 logIn.setBounds(192, 200, 115, 29);
                 logInFrame.getContentPane().add(logIn);
 
+                // If log in button is clicked
                 logIn.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
 
+                        // Search for user in database
                         int index = mySingleton.isCustomer(id.getText());
 
                         // Check if user exists
                         if(index != -1){
-                            if(mySingleton.getCustomers().get(index).getPassword().equals(passport.getText())){
+                            if(mySingleton.getCustomerByIndex(index).getPassword().equals(passport.getText())){
                                 loggedInUserIndex = index;
                                 frame.setEnabled(true);
                                 logInFrame.dispose();
@@ -183,9 +197,11 @@ public class op  {
             }
         });
 
+        // If sign up button is clicked
         signUpButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
+                // Set main menu unavailable
                 frame.setEnabled(false);
 
                 JFrame signUpFrame = new JFrame("Sign Up");
@@ -259,7 +275,7 @@ public class op  {
                 signUp.setBounds(192, 450, 115, 29);
                 signUpFrame.getContentPane().add(signUp);
 
-                // When the sign up button is clicked
+                // If sign up button is clicked
                 signUp.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                  
@@ -301,17 +317,13 @@ public class op  {
                             flag = true;
                         }
 
-                        // Checking if mail unique
+                        // Checking if mail and phone number unique
                         for(int i = 0; i < mySingleton.getCustomerSize(); i++){
                             if(mySingleton.getCustomerByIndex(i).getMail().equals(mail.getText())){
                                 total_error += "This mail is already used!\n";
                                 flag = true;
                                 break;
                             }
-                        }
-
-                        // Checking if phone number unique
-                        for(int i = 0; i < mySingleton.getCustomerSize(); i++){
                             if(mySingleton.getCustomerByIndex(i).getPhoneNumber().equals(phoneNumber.getText())){
                                 total_error += "This phone number is already used!\n";
                                 flag = true;
@@ -347,6 +359,7 @@ public class op  {
             }
         });
 
+        // When the login button is clicked
         logOutButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -356,6 +369,7 @@ public class op  {
             }
         });
 
+        // When the login button is clicked
         scheduleFlight.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -435,6 +449,37 @@ public class op  {
             }
         });
 
+        // When buy ticket button is clicked
+        buyTicket.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+                frame.setEnabled(false);
+
+                JFrame buyTicketFrame = new JFrame("Buy Ticket");
+                buyTicketFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                buyTicketFrame.setSize(1400, 1000);
+                buyTicketFrame.setLocation(200, 0);
+                buyTicketFrame.getContentPane().setLayout(null);
+                buyTicketFrame.setResizable(false);
+                buyTicketFrame.setVisible(true);
+
+                JTable flightTable = new JTable();
+                flightTable.setBounds(10, 10, 900, 920);
+                buyTicketFrame.getContentPane().add(flightTable);
+
+
+            
+                //1/Semarang-Kochi/21.12.2023/11:16-13:44/295/120/
+                //-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1
+                buyTicketFrame.addWindowListener(new java.awt.event.WindowAdapter() {
+                    @Override
+                    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                        frame.setEnabled(true);
+                    }
+                });
+
+            }
+        });
     }
 
     // Menus
@@ -445,6 +490,7 @@ public class op  {
         logOutButton.setVisible(false);
         userInfoLabel.setVisible(false);
         scheduleFlight.setVisible(false);
+        buyTicket.setVisible(false);
     }
 
     public static void adminMenu() {
@@ -453,6 +499,7 @@ public class op  {
         logOutButton.setVisible(true);
         userInfoLabel.setVisible(true);
         scheduleFlight.setVisible(true);
+        buyTicket.setVisible(false);
     }
 
     public static void userMenu() {
@@ -461,6 +508,7 @@ public class op  {
         logOutButton.setVisible(true);
         userInfoLabel.setVisible(true);
         scheduleFlight.setVisible(false);
+        buyTicket.setVisible(true);
     }
    
     // ***************************************************************************************************************************

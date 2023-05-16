@@ -1,18 +1,23 @@
+import java.time.LocalDateTime;
+
 public class flight {
     
     private int flightNo;
     private String flightDestination;
-    private String flightDate;
-    private String flightTime;
+    private LocalDateTime flightDateTime;
     private int price;
     private int availableSeats;
     private int[] flightSeats;
 
-    public flight(int flightNo, String flightDestination, String flightDate, String flightTime, int price, int availableSeats, int[] flightSeats) {
+    public flight(int flightNo, String flightDestination, String flightDateTime, int price, int availableSeats, int[] flightSeats) {
         this.flightNo = flightNo;
         this.flightDestination = flightDestination;
-        this.flightDate = flightDate;
-        this.flightTime = flightTime;
+
+        String[] parts = flightDateTime.split("T");
+        String[] date = parts[0].split("-");
+        String[] time = parts[1].split(":");
+        this.flightDateTime = LocalDateTime.of(Integer.parseInt(date[0]), Integer.parseInt(date[1]), Integer.parseInt(date[2]), Integer.parseInt(time[0]), Integer.parseInt(time[1]));
+
         this.price = price;
         this.availableSeats = availableSeats;
         this.flightSeats = flightSeats;
@@ -58,19 +63,16 @@ public class flight {
         this.flightSeats = flightSeats;
     }
 
-    public String getFlightDate() {
-        return flightDate;
+    public LocalDateTime getFlightDateTime() {
+        return flightDateTime;
     }
 
-    public void setFlightDate(String flightDate) {
-        this.flightDate = flightDate;
+    public void setFlightDateTime(LocalDateTime flightDateTime) {
+        this.flightDateTime = flightDateTime;
     }
 
-    public String getFlightTime() {
-        return flightTime;
+    public String getFlightDateTimeString() {
+        return flightDateTime.toString();
     }
 
-    public void setFlightTime(String flightTime) {
-        this.flightTime = flightTime;
-    }
 }

@@ -1,7 +1,11 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Queue;
 
 public class MySingleton {
 
@@ -32,6 +36,23 @@ public class MySingleton {
 
     public ArrayList<flight> getFlights(){
         return flights;
+    }
+
+    public ArrayList<flight> getFlights(String start, String end){
+        ArrayList <flight> temp = new ArrayList<flight>();
+
+        Boolean cond1 = start.equals(null) ? true : false;
+        Boolean cond2 = end.equals(null) ? true : false;
+
+        // Get flights with given start and end points and available seats and flight date is after now
+        for (flight flight : flights) {
+            if((cond1 || flight.getFlightDestination().equals(start)) && (cond2 || flight.getFlightDestination().equals(end))
+                && flight.getAvailableSeats() > 0 && flight.getFlightDateTime().isAfter(LocalDateTime.now())){
+                temp.add(flight);
+            }
+        }
+
+        return temp;
     }
 
     public void addCustomer(customer customer){
@@ -155,7 +176,7 @@ public class MySingleton {
     }
 
     public void flightReader() {
-        // flightNo/flightDestination/flightDate/flightTime/price/availableSeats/flightSeats
+        // flightNo/flightDestination/flightDate/price/availableSeats/flightSeats
         try {
 
             BufferedReader reader = new BufferedReader(new FileReader(flightsFilePath));
@@ -164,15 +185,15 @@ public class MySingleton {
             String line = reader.readLine();
             while (line != null) {
                 String[] parts = line.split("/");
-                String[] seats = parts[6].split(";");
+                String[] seats = parts[5].split(";");
 
                 int[] seatsInt = new int[120];
                 for (int i = 0; i < seats.length; i++) {
                     seatsInt[i] = Integer.parseInt(seats[i]);
                 }
 
-                flight newFlight = new flight(Integer.parseInt(parts[0]), parts[1], parts[2], parts[3],
-                        Integer.parseInt(parts[4]), Integer.parseInt(parts[5]), seatsInt);
+                flight newFlight = new flight(Integer.parseInt(parts[0]), parts[1], parts[2],
+                        Integer.parseInt(parts[3]), Integer.parseInt(parts[4]), seatsInt);
                 flights.add(newFlight);
 
                 line = reader.readLine();
@@ -183,6 +204,17 @@ public class MySingleton {
             // TODO Auto-generated catch block
             e1.printStackTrace();
             System.exit(0);
+        }finally{
+            
+            // Sort flights by date earliest to latest by date and time
+            Collections.sort(flights, new Comparator<flight>() {
+                @Override
+                public int compare(flight o1, flight o2) {
+                    return o1.getFlightDateTime().compareTo(o2.getFlightDateTime());
+                }
+            });
+
+            flightWriter();
         }
     }
 
@@ -192,7 +224,7 @@ public class MySingleton {
             FileWriter myWriter = new FileWriter(flightsFilePath);
             for (int i = 0; i < flights.size(); i++) {
                 myWriter.write(flights.get(i).getFlightNo() + "/" + flights.get(i).getFlightDestination() + "/"
-                        + flights.get(i).getFlightDate() + "/" + flights.get(i).getFlightTime() + "/"
+                        + flights.get(i).getFlightDateTimeString() + "/"
                         + flights.get(i).getPrice() + "/" + flights.get(i).getAvailableSeats() + "/");
 
                 for (int j = 0; j < 120; j++) {
