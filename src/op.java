@@ -20,7 +20,7 @@ public class op  {
     // create a string array list
     private MySingleton mySingleton = MySingleton.getInstance();
     private static int loggedInUserIndex = -1;
-
+    private static customer newCustomer;
     // Main Frame
     private static JFrame frame = new JFrame("Airline Booking and Management System");
 
@@ -34,6 +34,7 @@ public class op  {
     private static JLabel userInfoLabel = new JLabel();
     private static JLabel clockLabel = new JLabel();
     private static JButton scheduleFlight = new JButton("Schedule Flight");
+    private static JButton AccountSettings = new JButton("Account Settings");
     private static JButton buyTicket = new JButton("Buy Ticket");
 
     // Clock
@@ -103,6 +104,10 @@ public class op  {
         buyTicket.setBounds(160, 100, 150, 30);
         frame.getContentPane().add(buyTicket);
         buyTicket.setVisible(false);
+        
+        AccountSettings.setBounds(160, 200, 150, 30);
+        frame.getContentPane().add(AccountSettings);
+        AccountSettings.setVisible(false);
 
         // Main Menu Operations
         mainMenu();
@@ -151,12 +156,13 @@ public class op  {
 
                         // Search for user in database
                         int index = mySingleton.isCustomer(id.getText());
-
+                        
                         // Check if user exists
                         if(index != -1){
                             if(mySingleton.getCustomerByIndex(index).getPassword().equals(passport.getText())){
                                 loggedInUserIndex = index;
                                 frame.setEnabled(true);
+                                newCustomer=mySingleton.getCustomerByIndex(index);
                                 logInFrame.dispose();
                                 
                                 // Show welcome message
@@ -338,7 +344,7 @@ public class op  {
 
                             // Creating a new customer
                             mySingleton.addCustomer(new customer(name.getText(), surname.getText(), mail.getText(), password.getText(), phoneNumber.getText(), 
-                            admin.getText().equals("admin") ? 1 : 0, new ArrayList<Integer>()));
+                                    admin.getText().equals("admin") ? 1 : 0, new ArrayList<Integer>()));
 
                             signUpFrame.dispose();
                             frame.setEnabled(true);
@@ -480,6 +486,205 @@ public class op  {
 
             }
         });
+        AccountSettings.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+            	frame.setEnabled(false);
+
+                JFrame AccountSettingsFrame = new JFrame("Sign Up");
+                AccountSettingsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                AccountSettingsFrame.setSize(500, 600);
+                AccountSettingsFrame.setLocation(800, 200);
+                AccountSettingsFrame.getContentPane().setLayout(null);
+                AccountSettingsFrame.setResizable(false);
+                AccountSettingsFrame.setVisible(true);
+
+                JLabel nameLabel = new JLabel("Name");
+                nameLabel.setBounds(55, 91, 188, 20);
+                AccountSettingsFrame.getContentPane().add(nameLabel);
+
+                JTextField name = new JTextField();
+                name.setBounds(192, 88, 146, 26);
+                AccountSettingsFrame.getContentPane().add(name);
+                name.setColumns(10);
+
+                JLabel surnameLabel = new JLabel("Surname");
+                surnameLabel.setBounds(55, 151, 69, 20);
+                AccountSettingsFrame.getContentPane().add(surnameLabel);
+                AccountSettingsFrame.setVisible(true);
+
+                JTextField surname = new JTextField();
+                surname.setBounds(192, 148, 146, 26);
+                AccountSettingsFrame.getContentPane().add(surname);
+                surname.setColumns(10);
+
+                JLabel mailLabel = new JLabel("Mail");
+                mailLabel.setBounds(55, 211, 69, 20);
+                AccountSettingsFrame.getContentPane().add(mailLabel);
+                AccountSettingsFrame.setVisible(true);
+
+                JTextField mail = new JTextField();
+                mail.setBounds(192, 208, 146, 26);
+                AccountSettingsFrame.getContentPane().add(mail);
+                mail.setColumns(10);
+
+                JLabel passwordLabel = new JLabel("Password");
+                passwordLabel.setBounds(55, 271, 69, 20);
+                AccountSettingsFrame.getContentPane().add(passwordLabel);
+                AccountSettingsFrame.setVisible(true);
+
+                JTextField password = new JPasswordField();
+                password.setBounds(192, 268, 146, 26);
+                AccountSettingsFrame.getContentPane().add(password);
+                password.setColumns(10);
+
+                JLabel phoneNumberLabel = new JLabel("Phone Number");
+                phoneNumberLabel.setBounds(55, 331, 85, 20);
+                AccountSettingsFrame.getContentPane().add(phoneNumberLabel);
+                AccountSettingsFrame.setVisible(true);
+
+                JTextField phoneNumber = new JTextField();
+                phoneNumber.setBounds(192, 328, 146, 26);
+                AccountSettingsFrame.getContentPane().add(phoneNumber);
+                phoneNumber.setColumns(10);
+
+                JButton AccountSettings = new JButton("Save");
+                AccountSettings.setBounds(192, 450, 115, 29);
+                AccountSettingsFrame.getContentPane().add(AccountSettings);
+                // If save button is clicked
+                AccountSettings.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                 
+                        Boolean flag = false;
+                        String total_error = "";
+                        customer tempCustomer=newCustomer;
+
+                        // Check if name and surname contains only letters
+                        if(!name.getText().equals("")) {
+	                        if (!name.getText().matches("[a-zA-Z]+")) {
+	                            total_error += "Name must contain only letters!\n";
+	                            flag = true;
+	                        }
+	                        else if (name.getText().equals(newCustomer.getName())) {
+	                            total_error += "Name shouldn't be the same as last  name!\n";
+	                            flag = true;
+	                        }
+	                        else{
+	                        	tempCustomer.setName(name.getText());
+	                        }
+                        }
+                        
+                        if(!surname.getText().equals("")) {
+	                        if(!surname.getText().matches("[a-zA-Z]+")) {
+	                        	total_error += "Surname must contain only letters!\n";
+	                            flag = true;
+	                        }
+	                        else if (surname.getText().equals(newCustomer.getName())) {
+	                            total_error += "Surname shouldn't be the same as last surname!\n";
+	                            flag = true;
+	                        }
+	                        else{
+	                        	tempCustomer.setSurname(surname.getText());
+	                        }
+                        }
+                        // Checking if the mail and phone number is valid
+                        if(!mail.getText().equals("")) {
+	                        mail.setText(mail.getText().replaceAll(" ", ""));
+	                        if (!mail.getText().endsWith("@gmail.com") 
+	                        		&& !mail.getText().endsWith("@hotmail.com")
+	                                && !mail.getText().endsWith("@outlook.com") && !mail.getText().endsWith("@yahoo.com")) {
+	                        	
+	                            total_error += "Please enter a valid mail!\n";
+	                            flag = true;
+	                        }
+	                        else if(mail.equals(newCustomer.getMail())){
+	                        	
+	                            total_error += "This mail can not be the same as your last mail!\n";
+	                            flag = true;
+	                        }
+                        }
+                        
+                        
+                        // Checking if the phone number is valid
+                        if(!phoneNumber.getText().equals("")) {
+	                        if ((phoneNumber.getText().length() != 11 
+	                        		|| !phoneNumber.getText().startsWith("0")
+	                                || !phoneNumber.getText().matches("[0-9]+"))) {
+	                            total_error += "Please enter a valid phone number!\n";
+	                            flag = true;
+	                        }
+	                        else if(phoneNumber.equals(newCustomer.getPhoneNumber())){
+	                            total_error += "This phone number can not be the same as your last phone Number!\n";
+	                            flag = true;
+	                        }
+                        }
+                       
+                        
+                        // Checking password length
+                        if(!password.getText().equals("")) {
+	                        if (password.getText().length() < 8) {
+	                            total_error += "Password must be at least 8 characters!\n";
+	                            flag = true;
+	                        }
+	                        else if(password.equals(newCustomer.getPassword())){
+	                            total_error += "This password can not be the same as your last password!\n";
+	                            flag = true;
+	                        }
+	                        else{
+	                        	tempCustomer.setPassword(password.getText());
+	                        }
+                        }
+                        Boolean checkMail=true,checkPhoneNumber=true;
+                        // Checking if mail and phone number unique
+                        if(mail.getText().equals("")){
+                        	checkMail=false;
+                        }
+                    	if(phoneNumber.getText().equals("")){
+                    		checkPhoneNumber=false;
+                        }
+                    	for(int i = 0; i < mySingleton.getCustomerSize(); i++){
+                            if(checkMail&&mySingleton.getCustomerByIndex(i).getMail().equals(mail.getText())){
+                                total_error += "This mail is already used!\n";
+                                flag = true;
+                                break;
+                            }
+                            if(checkPhoneNumber&&mySingleton.getCustomerByIndex(i).getPhoneNumber().equals(phoneNumber.getText())){
+                                total_error += "This phone number is already used!\n";
+                                flag = true;
+                                break;
+                            }
+                       }
+                       if(checkMail) { //if mail has changed
+                    	   tempCustomer.setMail(mail.getText());
+                       }
+                       if(checkPhoneNumber) {//if phone number has changed
+                    	   tempCustomer.setPhoneNumber(phoneNumber.getText());
+                       }
+                        if(flag){
+                            JOptionPane.showMessageDialog(null, total_error, "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                        else{
+                        	//Checking which informations has been changed
+                        	mySingleton.removeCustomer(newCustomer);
+                        	mySingleton.addCustomer(tempCustomer);
+                        	newCustomer=tempCustomer;
+                            AccountSettingsFrame.dispose();
+                            frame.setEnabled(true);
+                            JOptionPane.showMessageDialog(null, tempCustomer.getName() , "Success", JOptionPane.INFORMATION_MESSAGE);
+                        }
+                    }
+                });
+                //1/Semarang-Kochi/21.12.2023/11:16-13:44/295/120/
+                //-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1
+                AccountSettingsFrame.addWindowListener(new java.awt.event.WindowAdapter() {
+                    @Override
+                    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                        frame.setEnabled(true);
+                    }
+                });
+
+            }
+        });
     }
 
     // Menus
@@ -491,6 +696,7 @@ public class op  {
         userInfoLabel.setVisible(false);
         scheduleFlight.setVisible(false);
         buyTicket.setVisible(false);
+        AccountSettings.setVisible(false);
     }
 
     public static void adminMenu() {
@@ -501,7 +707,7 @@ public class op  {
         scheduleFlight.setVisible(true);
         buyTicket.setVisible(false);
     }
-
+    
     public static void userMenu() {
         logInButton.setVisible(false);
         signUpButton.setVisible(false);
@@ -509,6 +715,7 @@ public class op  {
         userInfoLabel.setVisible(true);
         scheduleFlight.setVisible(false);
         buyTicket.setVisible(true);
+        AccountSettings.setVisible(true);
     }
    
     // ***************************************************************************************************************************
