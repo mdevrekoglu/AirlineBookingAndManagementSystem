@@ -1,3 +1,5 @@
+import java.awt.BorderLayout;
+import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Date;
@@ -12,8 +14,12 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 
 public class op  {
 
@@ -461,22 +467,163 @@ public class op  {
 
                 frame.setEnabled(false);
 
+                // Create a new frame
                 JFrame buyTicketFrame = new JFrame("Buy Ticket");
                 buyTicketFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                 buyTicketFrame.setSize(1400, 1000);
+
                 buyTicketFrame.setLocation(200, 0);
                 buyTicketFrame.getContentPane().setLayout(null);
                 buyTicketFrame.setResizable(false);
                 buyTicketFrame.setVisible(true);
+        
+                
+                JScrollPane scrollPane = new JScrollPane();
+                scrollPane.setBounds(10, 11, 850, 940);
+                buyTicketFrame.getContentPane().add(scrollPane);
+                
+                MySingleton mySingleton = MySingleton.getInstance();
+                ArrayList<flight> currenFlights = mySingleton.getFlights("", "");
+                Object[][] data = new Object[currenFlights.size()][5];
+        
+                for (int i = 0; i < currenFlights.size(); i++) {                  
+                    data[i][0] = currenFlights.get(i).getFlightNo();
+                    data[i][1] = currenFlights.get(i).getFlightDestination();
+                    data[i][2] = currenFlights.get(i).getFlightDateTime();
+                    data[i][3] = currenFlights.get(i).getPrice();
+                    data[i][4] = currenFlights.get(i).getAvailableSeats();
+                }
+                
+                JTable table = new JTable();
+                table.setModel(new DefaultTableModel(
+                    data,
+                    new String[] {
+                        "Flight No", "Start - End", "Flight Date and Hour", "Price", "Available Seats"
+                    }
+                ) {
+                    Class[] columnTypes = new Class[] {
+                        Integer.class, String.class, String.class, Integer.class, Integer.class
+                    };
+                    public Class getColumnClass(int columnIndex) {
+                        return columnTypes[columnIndex];
+                    }
+                    boolean[] columnEditables = new boolean[] {
+                        false, false, false, false, false
+                    };
+                    public boolean isCellEditable(int row, int column) {
+                        return columnEditables[column];
+                    }
+                });
+                table.getColumnModel().getColumn(0).setResizable(false);
+                table.getColumnModel().getColumn(1).setPreferredWidth(261);
+                table.getColumnModel().getColumn(2).setResizable(false);
+                table.getColumnModel().getColumn(2).setPreferredWidth(114);
+                table.getColumnModel().getColumn(3).setResizable(false);
+                table.getColumnModel().getColumn(3).setPreferredWidth(51);
+                table.getColumnModel().getColumn(4).setResizable(false);
+                table.getColumnModel().getColumn(4).setPreferredWidth(90);
+                scrollPane.setViewportView(table);
 
-                JTable flightTable = new JTable();
-                flightTable.setBounds(10, 10, 900, 920);
-                buyTicketFrame.getContentPane().add(flightTable);
+                // Start Point
+                JLabel startPointLabel = new JLabel("Start Point");
+                startPointLabel.setBounds(900, 50, 85, 20);
+                buyTicketFrame.getContentPane().add(startPointLabel);
+                buyTicketFrame.setVisible(true);
+
+                JTextField startPoint = new JTextField();
+                startPoint.setBounds(900, 80, 146, 26);
+                buyTicketFrame.getContentPane().add(startPoint);
+                startPoint.setColumns(20);
+
+                // End Point
+                JLabel endPointLabel = new JLabel("End Point");
+                endPointLabel.setBounds(900, 120, 85, 20);
+                buyTicketFrame.getContentPane().add(endPointLabel);
+                buyTicketFrame.setVisible(true);
+
+                JTextField endPoint = new JTextField();
+                endPoint.setBounds(900, 150, 146, 26);
+                buyTicketFrame.getContentPane().add(endPoint);
+                endPoint.setColumns(20);
+
+                // Update button
+                JButton update = new JButton("Update");
+                update.setBounds(900, 200, 115, 29);
+                buyTicketFrame.getContentPane().add(update);
+                buyTicketFrame.setVisible(true);
+
+                // Buy button
+                JButton buy = new JButton("Buy");
+                buy.setBounds(900, 250, 115, 29);
+                buyTicketFrame.getContentPane().add(buy);
+                buyTicketFrame.setVisible(true);
+
+                // When update button is clicked
+                update.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        String start = startPoint.getText();
+                        String end = endPoint.getText();
+                        ArrayList<flight> currenFlights = mySingleton.getFlights(start, end);
+                        Object[][] data = new Object[currenFlights.size()][5];
+                
+                        for (int i = 0; i < currenFlights.size(); i++) {                  
+                            data[i][0] = currenFlights.get(i).getFlightNo();
+                            data[i][1] = currenFlights.get(i).getFlightDestination();
+                            data[i][2] = currenFlights.get(i).getFlightDateTime();
+                            data[i][3] = currenFlights.get(i).getPrice();
+                            data[i][4] = currenFlights.get(i).getAvailableSeats();
+                        }
+                        
+                        JTable table = new JTable();
+                        table.setModel(new DefaultTableModel(
+                            data,
+                            new String[] {
+                                "Flight No", "Start - End", "Flight Date and Hour", "Price", "Available Seats"
+                            }
+                        ) {
+                            Class[] columnTypes = new Class[] {
+                                Integer.class, String.class, String.class, Integer.class, Integer.class
+                            };
+                            public Class getColumnClass(int columnIndex) {
+                                return columnTypes[columnIndex];
+                            }
+                            boolean[] columnEditables = new boolean[] {
+                                false, false, false, false, false
+                            };
+                            public boolean isCellEditable(int row, int column) {
+                                return columnEditables[column];
+                            }
+                        });
+                        table.getColumnModel().getColumn(0).setResizable(false);
+                        table.getColumnModel().getColumn(1).setPreferredWidth(261);
+                        table.getColumnModel().getColumn(2).setResizable(false);
+                        table.getColumnModel().getColumn(2).setPreferredWidth(114);
+                        table.getColumnModel().getColumn(3).setResizable(false);
+                        table.getColumnModel().getColumn(3).setPreferredWidth(51);
+                        table.getColumnModel().getColumn(4).setResizable(false);
+                        table.getColumnModel().getColumn(4).setPreferredWidth(90);
+                        scrollPane.setViewportView(table);
+                    }
+                });
+
+                // When buy button is clicked
+                buy.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        int row = table.getSelectedRow();
+                        int flightNo = (int) table.getModel().getValueAt(row, 0);
+                        int price = (int) table.getModel().getValueAt(row, 3);
+                        int availableSeats = (int) table.getModel().getValueAt(row, 4);
+                        
+                        System.out.println("Flight No: " + flightNo);
+                        System.out.println("Price: " + price);
+                        System.out.println("Available Seats: " + availableSeats);
 
 
-            
-                //1/Semarang-Kochi/21.12.2023/11:16-13:44/295/120/
-                //-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1
+
+                    }
+                });
+
+                // If buyticket frame is closed, enable the main frame
                 buyTicketFrame.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent windowEvent) {
@@ -486,6 +633,7 @@ public class op  {
 
             }
         });
+        
         AccountSettings.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 

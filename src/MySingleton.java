@@ -41,12 +41,13 @@ public class MySingleton {
     public ArrayList<flight> getFlights(String start, String end){
         ArrayList <flight> temp = new ArrayList<flight>();
 
-        Boolean cond1 = start.equals(null) ? true : false;
-        Boolean cond2 = end.equals(null) ? true : false;
+        Boolean cond1 = start.equals("") ? true : false;
+        Boolean cond2 = end.equals("") ? true : false;
 
         // Get flights with given start and end points and available seats and flight date is after now
         for (flight flight : flights) {
-            if((cond1 || flight.getFlightDestination().equals(start)) && (cond2 || flight.getFlightDestination().equals(end))
+            if((cond1 || flight.getFlightDestination().split("-")[0].equalsIgnoreCase(start)) 
+                && (cond2 || flight.getFlightDestination().split("-")[1].equalsIgnoreCase(end))
                 && flight.getAvailableSeats() > 0 && flight.getFlightDateTime().isAfter(LocalDateTime.now())){
                 temp.add(flight);
             }

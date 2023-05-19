@@ -42,7 +42,7 @@ for i in range(10000):
     date = f"2023-{random.randint(1, 12):02d}-{random.randint(1, 28):02d}"
     
     # Generate a random flying time between 1 and 12 hours
-    flying_hours = random.randint(1, 12)
+    flying_hours = random.randint(1, 23)
     flying_minutes = random.randint(0, 59)
     flying_time = f"{flying_hours:02d}:{flying_minutes:02d}"
     
