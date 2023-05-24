@@ -1,4 +1,5 @@
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -9,10 +10,13 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+
+import javax.security.auth.x500.X500Principal;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -21,7 +25,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
-public class op  {
+public class op {
 
     // create a string array list
     private MySingleton mySingleton = MySingleton.getInstance();
@@ -35,23 +39,24 @@ public class op  {
     private static JButton signUpButton = new JButton("Sign Up");
     private static JButton logOutButton = new JButton("Log Out");
 
-
     // User Label and Buttons
     private static JLabel userInfoLabel = new JLabel();
     private static JLabel clockLabel = new JLabel();
     private static JButton scheduleFlight = new JButton("Schedule Flight");
+
     private static JButton AccountSettings = new JButton("Account Settings");
     private static JButton buyTicket = new JButton("Buy Ticket");
+    private static JButton MySchedule = new JButton("My Schedule");
 
     // Clock
-    public void clock(){
-        Thread clock = new Thread(){
-            public void run(){
-                try{
-                    for(;;){
+    public void clock() {
+        Thread clock = new Thread() {
+            public void run() {
+                try {
+                    for (;;) {
                         Calendar cal = new GregorianCalendar();
                         int day = cal.get(Calendar.DAY_OF_MONTH);
-                        int month = cal.get((Calendar.MONTH)+1)%12;
+                        int month = cal.get((Calendar.MONTH) + 1) % 12;
                         int year = cal.get(Calendar.YEAR);
 
                         int second = cal.get(Calendar.SECOND);
@@ -63,7 +68,7 @@ public class op  {
                         clockLabel.setText(clock + "   " + date);
                         sleep(250);
                     }
-                }catch(Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -107,11 +112,15 @@ public class op  {
         frame.getContentPane().add(scheduleFlight);
         scheduleFlight.setVisible(false);
 
-        buyTicket.setBounds(160, 100, 150, 30);
+        buyTicket.setBounds(160, 150, 150, 30);
         frame.getContentPane().add(buyTicket);
         buyTicket.setVisible(false);
-        
-        AccountSettings.setBounds(160, 200, 150, 30);
+
+        MySchedule.setBounds(160, 200, 150, 30);
+        frame.getContentPane().add(MySchedule);
+        MySchedule.setVisible(false);
+
+        AccountSettings.setBounds(160, 250, 150, 30);
         frame.getContentPane().add(AccountSettings);
         AccountSettings.setVisible(false);
 
@@ -121,7 +130,7 @@ public class op  {
         // If logged in button is clicked
         logInButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                
+
                 // Set main menu unavailable
                 frame.setEnabled(false);
 
@@ -162,36 +171,40 @@ public class op  {
 
                         // Search for user in database
                         int index = mySingleton.isCustomer(id.getText());
-                        
+
                         // Check if user exists
-                        if(index != -1){
-                            if(mySingleton.getCustomerByIndex(index).getPassword().equals(passport.getText())){
+                        if (index != -1) {
+                            if (mySingleton.getCustomerByIndex(index).getPassword().equals(passport.getText())) {
                                 loggedInUserIndex = index;
                                 frame.setEnabled(true);
-                                newCustomer=mySingleton.getCustomerByIndex(index);
+                                newCustomer = mySingleton.getCustomerByIndex(index);
                                 logInFrame.dispose();
-                                
+
                                 // Show welcome message
-                                JOptionPane.showMessageDialog(null, "Welcome " + mySingleton.getCustomers().get(index).getName() + " " + mySingleton.getCustomers().get(index).getSurname(), "Welcome",
-                                    JOptionPane.INFORMATION_MESSAGE);
+                                JOptionPane.showMessageDialog(null,
+                                        "Welcome " + mySingleton.getCustomers().get(index).getName() + " "
+                                                + mySingleton.getCustomers().get(index).getSurname(),
+                                        "Welcome",
+                                        JOptionPane.INFORMATION_MESSAGE);
 
                                 // Show user info
-                                userInfoLabel.setText("Welcome " + mySingleton.getCustomers().get(index).getName() + " " + mySingleton.getCustomers().get(index).getSurname());
+                                userInfoLabel.setText("Welcome " + mySingleton.getCustomers().get(index).getName() + " "
+                                        + mySingleton.getCustomers().get(index).getSurname());
 
                                 // Show menu depending on user type
-                                if(mySingleton.getCustomers().get(index).getUserType() == 1){
+                                if (mySingleton.getCustomers().get(index).getUserType() == 1) {
                                     adminMenu();
-                                }else if(mySingleton.getCustomers().get(index).getUserType() == 0){
+                                } else if (mySingleton.getCustomers().get(index).getUserType() == 0) {
                                     userMenu();
-                                }else{
+                                } else {
                                     userMenu();
                                     mySingleton.getCustomers().get(index).setUserType(0);
                                 }
-                            }else{
+                            } else {
                                 JOptionPane.showMessageDialog(null, "Wrong ID or Password!", "Error",
-                                    JOptionPane.ERROR_MESSAGE);
+                                        JOptionPane.ERROR_MESSAGE);
                             }
-                        }else{
+                        } else {
                             JOptionPane.showMessageDialog(null, "Wrong ID or Password!", "Error",
                                     JOptionPane.ERROR_MESSAGE);
                         }
@@ -290,7 +303,7 @@ public class op  {
                 // If sign up button is clicked
                 signUp.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                 
+
                         Boolean flag = false;
                         String total_error = "";
 
@@ -330,13 +343,13 @@ public class op  {
                         }
 
                         // Checking if mail and phone number unique
-                        for(int i = 0; i < mySingleton.getCustomerSize(); i++){
-                            if(mySingleton.getCustomerByIndex(i).getMail().equals(mail.getText())){
+                        for (int i = 0; i < mySingleton.getCustomerSize(); i++) {
+                            if (mySingleton.getCustomerByIndex(i).getMail().equals(mail.getText())) {
                                 total_error += "This mail is already used!\n";
                                 flag = true;
                                 break;
                             }
-                            if(mySingleton.getCustomerByIndex(i).getPhoneNumber().equals(phoneNumber.getText())){
+                            if (mySingleton.getCustomerByIndex(i).getPhoneNumber().equals(phoneNumber.getText())) {
                                 total_error += "This phone number is already used!\n";
                                 flag = true;
                                 break;
@@ -344,18 +357,20 @@ public class op  {
                         }
 
                         // Checking if admin password is correct
-                        if(flag){
+                        if (flag) {
                             JOptionPane.showMessageDialog(null, total_error, "Error", JOptionPane.ERROR_MESSAGE);
-                        }else{
+                        } else {
 
                             // Creating a new customer
-                            mySingleton.addCustomer(new customer(name.getText(), surname.getText(), mail.getText(), password.getText(), phoneNumber.getText(), 
+                            mySingleton.addCustomer(new customer(name.getText(), surname.getText(), mail.getText(),
+                                    password.getText(), phoneNumber.getText(),
                                     admin.getText().equals("admin") ? 1 : 0, new ArrayList<Integer>()));
 
                             signUpFrame.dispose();
                             frame.setEnabled(true);
 
-                            JOptionPane.showMessageDialog(null, "You have successfully signed up!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                            JOptionPane.showMessageDialog(null, "You have successfully signed up!", "Success",
+                                    JOptionPane.INFORMATION_MESSAGE);
                         }
                     }
                 });
@@ -381,7 +396,7 @@ public class op  {
             }
         });
 
-        // When the login button is clicked
+        // When the schedule flight button is clicked
         scheduleFlight.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -405,49 +420,133 @@ public class op  {
                 flightNumber.setColumns(10);
 
                 JLabel destinationLabel = new JLabel("Destination");
-                destinationLabel.setBounds(55, 151, 69, 20);
+                destinationLabel.setBounds(55, 135, 69, 20);
                 scheduleFlightFrame.getContentPane().add(destinationLabel);
                 scheduleFlightFrame.setVisible(true);
 
                 JTextField destination = new JTextField();
-                destination.setBounds(192, 148, 146, 26);
+                destination.setBounds(192, 132, 146, 26);
                 scheduleFlightFrame.getContentPane().add(destination);
                 destination.setColumns(10);
 
                 JLabel dateLabel = new JLabel("Date");
-                dateLabel.setBounds(55, 271, 69, 20);
+                dateLabel.setBounds(55, 182, 69, 20);
                 scheduleFlightFrame.getContentPane().add(dateLabel);
                 scheduleFlightFrame.setVisible(true);
 
                 JTextField date = new JTextField();
-                date.setBounds(192, 268, 146, 26);
+                date.setBounds(192, 179, 146, 26);
                 scheduleFlightFrame.getContentPane().add(date);
                 date.setColumns(10);
 
                 JLabel timeLabel = new JLabel("Time");
-                timeLabel.setBounds(55, 331, 85, 20);
+                timeLabel.setBounds(55, 229, 85, 20);
                 scheduleFlightFrame.getContentPane().add(timeLabel);
                 scheduleFlightFrame.setVisible(true);
 
                 JTextField time = new JTextField();
-                time.setBounds(192, 328, 146, 26);
-
+                time.setBounds(192, 226, 146, 26);
                 scheduleFlightFrame.getContentPane().add(time);
                 time.setColumns(10);
 
                 JLabel priceLabel = new JLabel("Price");
-                priceLabel.setBounds(55, 391, 85, 20);
+                priceLabel.setBounds(55, 273, 85, 20);
                 scheduleFlightFrame.getContentPane().add(priceLabel);
                 scheduleFlightFrame.setVisible(true);
 
                 JTextField price = new JTextField();
-                price.setBounds(192, 388, 146, 26);
+                price.setBounds(192, 270, 146, 26);
                 scheduleFlightFrame.getContentPane().add(price);
                 price.setColumns(10);
 
-                JButton scheduleFlight = new JButton("Schedule Flight");
-                scheduleFlight.setBounds(192, 450, 130, 29);
-                scheduleFlightFrame.getContentPane().add(scheduleFlight);
+                JLabel capacityLabel = new JLabel("Capacity");
+                capacityLabel.setBounds(55, 317, 85, 20);
+                scheduleFlightFrame.getContentPane().add(capacityLabel);
+                scheduleFlightFrame.setVisible(true);
+
+                JTextField capacity = new JTextField();
+                capacity.setBounds(192, 314, 146, 26);
+                scheduleFlightFrame.getContentPane().add(capacity);
+                capacity.setColumns(10);
+
+                JButton addFlight = new JButton("Add Flight");
+                addFlight.setBounds(192, 364, 130, 29);
+                scheduleFlightFrame.getContentPane().add(addFlight);
+                addFlight.setVisible(true);
+
+                // When the scheduleFlight button is clicked
+                addFlight.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        boolean flag = false;
+                        String total_error = "";
+                        if (flightNumber.getText().equals("") || destination.getText().equals("")
+                                || date.getText().equals("") || time.getText().equals("")
+                                || price.getText().equals("") || capacity.getText().equals("")) {
+                            flag = true;
+                            total_error += "Please fill all the fields!\n";
+                        }
+                        if (!flightNumber.getText().matches("[0-9]+")) {
+                            total_error += "Flight number must be contains only integer!\n";
+                            flag = true;
+                        }
+                        if (!destination.getText().contains("-")) {
+                            total_error += "Destination must be filled From-To !\n";
+                            flag = true;
+                        }
+                        if (!date.getText().matches("\\d{4}-\\d{2}-\\d{2}")
+                                && !date.getText().startsWith("[0-9]{4}-[0-9]{2}-[0-9]{2}")) {
+                            total_error += "Date must be filled YYYY-MM-DD !\n";
+                            flag = true;
+                        }
+                        if (!time.getText().equals("\\d{2}:\\d{2}")
+                                || !time.getText().contains(":")) {
+                            // String[] check_time=time.getText().split(":");
+                            // if(Integer.parseInt(check_time[0])>24||Integer.parseInt(check_time[0])<0)
+                            // total_error +="Hour must be between 00-24!\n";
+                            // else
+                            // if(Integer.parseInt(check_time[1])<0||Integer.parseInt(check_time[1])>59)
+                            // total_error +="Minute must be between 00-59!\n";
+                            // else
+                            // total_error += "Time must be filled HH:MM !\n"; CTRL+K CTRL+U YORUM SATIRINI
+                            // TOPLU KALDIRIR
+                            total_error += "Time must be filled HH:MM !\n";
+                            flag = true;
+                        }
+                        if (!price.getText().matches("[0-9]+")) {
+                            total_error += "Price must be contains only positive integer!\n";
+                            flag = true;
+                        }
+                        if (!capacity.getText().matches("[0-9]+")) {
+                            total_error += "Capacity must be contains only positive integer!\n";
+                            flag = true;
+                        }
+
+                        // Checking if the flight number already exists
+
+                        if ((mySingleton.isFlight(Integer.parseInt(flightNumber.getText()))) != -1) {
+                            JOptionPane.showMessageDialog(null, "Flight number already exists!", "Error",
+                                    JOptionPane.ERROR_MESSAGE);
+                            flag = true;
+                        }
+                        if (flag) {
+                            JOptionPane.showMessageDialog(null, total_error, "Error",
+                                    JOptionPane.ERROR_MESSAGE);
+                        } else {
+                            String parts = date.getText() + "T" + time.getText();
+                            int availableSeats = capacity.getText().length();
+                            int flightSeats[] = new int[capacity.getText().length()];
+                            mySingleton.addFlight(
+                                    new flight(Integer.parseInt(flightNumber.getText()), destination.getText(), parts,
+                                            Integer.parseInt(price.getText()), availableSeats, flightSeats));
+                            JOptionPane.showMessageDialog(null, "Flight scheduled successfully!", "Success",
+                                    JOptionPane.INFORMATION_MESSAGE);
+                            scheduleFlightFrame.dispose();
+                            frame.setEnabled(true);
+                        }
+                    }
+                });
+
+                // When the flight adding frame is closed, the main frame is enabled
 
                 // 10047/Paris-Istanbul/01.04.2023/10:10-12:10/100/120/-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1
 
@@ -470,46 +569,47 @@ public class op  {
                 // Create a new frame
                 JFrame buyTicketFrame = new JFrame("Buy Ticket");
                 buyTicketFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                buyTicketFrame.setSize(1400, 1000);
+                buyTicketFrame.setSize(1920, 1080);
 
-                buyTicketFrame.setLocation(200, 0);
+                buyTicketFrame.setLocation(-10, 0);
                 buyTicketFrame.getContentPane().setLayout(null);
                 buyTicketFrame.setResizable(false);
                 buyTicketFrame.setVisible(true);
-        
-                
+
                 JScrollPane scrollPane = new JScrollPane();
                 scrollPane.setBounds(10, 11, 850, 940);
                 buyTicketFrame.getContentPane().add(scrollPane);
-                
+
                 MySingleton mySingleton = MySingleton.getInstance();
                 ArrayList<flight> currenFlights = mySingleton.getFlights("", "");
                 Object[][] data = new Object[currenFlights.size()][5];
-        
-                for (int i = 0; i < currenFlights.size(); i++) {                  
+
+                for (int i = 0; i < currenFlights.size(); i++) {
                     data[i][0] = currenFlights.get(i).getFlightNo();
                     data[i][1] = currenFlights.get(i).getFlightDestination();
                     data[i][2] = currenFlights.get(i).getFlightDateTime();
                     data[i][3] = currenFlights.get(i).getPrice();
                     data[i][4] = currenFlights.get(i).getAvailableSeats();
                 }
-                
+
                 JTable table = new JTable();
                 table.setModel(new DefaultTableModel(
-                    data,
-                    new String[] {
-                        "Flight No", "Start - End", "Flight Date and Hour", "Price", "Available Seats"
-                    }
-                ) {
+                        data,
+                        new String[] {
+                                "Flight No", "Start - End", "Flight Date and Hour", "Price", "Available Seats"
+                        }) {
                     Class[] columnTypes = new Class[] {
-                        Integer.class, String.class, String.class, Integer.class, Integer.class
+                            Integer.class, String.class, String.class, Integer.class, Integer.class
                     };
+
                     public Class getColumnClass(int columnIndex) {
                         return columnTypes[columnIndex];
                     }
+
                     boolean[] columnEditables = new boolean[] {
-                        false, false, false, false, false
+                            false, false, false, false, false
                     };
+
                     public boolean isCellEditable(int row, int column) {
                         return columnEditables[column];
                     }
@@ -552,6 +652,11 @@ public class op  {
                 buyTicketFrame.getContentPane().add(update);
                 buyTicketFrame.setVisible(true);
 
+                clockLabel.setBounds(900, 750, 200, 50);
+                buyTicketFrame.getContentPane().add(clockLabel);
+                clockLabel.setVisible(true);
+                clock();
+
                 // Buy button
                 JButton buy = new JButton("Buy");
                 buy.setBounds(900, 250, 115, 29);
@@ -565,31 +670,33 @@ public class op  {
                         String end = endPoint.getText();
                         ArrayList<flight> currenFlights = mySingleton.getFlights(start, end);
                         Object[][] data = new Object[currenFlights.size()][5];
-                
-                        for (int i = 0; i < currenFlights.size(); i++) {                  
+
+                        for (int i = 0; i < currenFlights.size(); i++) {
                             data[i][0] = currenFlights.get(i).getFlightNo();
                             data[i][1] = currenFlights.get(i).getFlightDestination();
                             data[i][2] = currenFlights.get(i).getFlightDateTime();
                             data[i][3] = currenFlights.get(i).getPrice();
                             data[i][4] = currenFlights.get(i).getAvailableSeats();
                         }
-                        
+
                         JTable table = new JTable();
                         table.setModel(new DefaultTableModel(
-                            data,
-                            new String[] {
-                                "Flight No", "Start - End", "Flight Date and Hour", "Price", "Available Seats"
-                            }
-                        ) {
+                                data,
+                                new String[] {
+                                        "Flight No", "Start - End", "Flight Date and Hour", "Price", "Available Seats"
+                                }) {
                             Class[] columnTypes = new Class[] {
-                                Integer.class, String.class, String.class, Integer.class, Integer.class
+                                    Integer.class, String.class, String.class, Integer.class, Integer.class
                             };
+
                             public Class getColumnClass(int columnIndex) {
                                 return columnTypes[columnIndex];
                             }
+
                             boolean[] columnEditables = new boolean[] {
-                                false, false, false, false, false
+                                    false, false, false, false, false
                             };
+
                             public boolean isCellEditable(int row, int column) {
                                 return columnEditables[column];
                             }
@@ -613,12 +720,10 @@ public class op  {
                         int flightNo = (int) table.getModel().getValueAt(row, 0);
                         int price = (int) table.getModel().getValueAt(row, 3);
                         int availableSeats = (int) table.getModel().getValueAt(row, 4);
-                        
+
                         System.out.println("Flight No: " + flightNo);
                         System.out.println("Price: " + price);
                         System.out.println("Available Seats: " + availableSeats);
-
-
 
                     }
                 });
@@ -633,11 +738,63 @@ public class op  {
 
             }
         });
-        
+        // When My Schedule button is clicked
+        MySchedule.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                frame.setEnabled(false);
+
+                JFrame MyScheduleFrame = new JFrame("My Schedule");
+                MyScheduleFrame.setSize(500, 600);
+                MyScheduleFrame.setLocation(800, 200);
+                MyScheduleFrame.getContentPane().setLayout(null);
+                MyScheduleFrame.setResizable(false);
+                MyScheduleFrame.setVisible(true);
+
+                JLabel MyScheduleLabel = new JLabel("My Schedule");
+                MyScheduleLabel.setBounds(200, 91, 188, 20);
+                MyScheduleFrame.getContentPane().add(MyScheduleLabel);
+                MyScheduleFrame.addWindowListener(new java.awt.event.WindowAdapter() {
+                    @Override
+                    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                        frame.setEnabled(true);
+                    }
+                });
+
+                JTable MyScheduleTable = new JTable();
+                JScrollPane scrollPane = new JScrollPane(MyScheduleTable);
+                scrollPane.setBounds(50, 150, 400, 300);
+                MyScheduleFrame.getContentPane().add(scrollPane);
+                MyScheduleTable.setBackground(Color.LIGHT_GRAY);
+
+                scrollPane.setViewportView(MyScheduleTable);
+
+                //MySingleton mySingleton = MySingleton.getInstance();
+               // ArrayList<flight> customersFlights = mySingleton.getCustomersFlights();
+               // mySingleton.get
+               //loggedInUserIndex
+               
+
+                String[] columnNames = { "Flight No", "Flight Date and Hour", "Seat No " };
+                String[][] data = { { "1", "2", "3" }, { "4", "5", "6" }, { "7", "8", "9" } };
+                MyScheduleTable.setModel(new DefaultTableModel(data, columnNames));
+                MyScheduleTable.setDefaultEditor(getClass(), null);
+                MyScheduleTable.setEnabled(false); // to disable table editing
+                MyScheduleTable.getColumnModel().getColumn(0).setResizable(false);
+                MyScheduleTable.getColumnModel().getColumn(1).setPreferredWidth(261);
+                MyScheduleTable.getColumnModel().getColumn(2).setResizable(false);
+
+                MyScheduleFrame.setVisible(true);
+
+                DefaultTableModel modeloo = new DefaultTableModel(data, columnNames);
+
+                MyScheduleTable = new JTable(modeloo);
+
+            }
+        });
         AccountSettings.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-            	frame.setEnabled(false);
+                frame.setEnabled(false);
 
                 JFrame AccountSettingsFrame = new JFrame("Sign Up");
                 AccountSettingsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -702,128 +859,120 @@ public class op  {
                 // If save button is clicked
                 AccountSettings.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                 
+
                         Boolean flag = false;
                         String total_error = "";
-                        customer tempCustomer=newCustomer;
+                        customer tempCustomer = newCustomer;
 
                         // Check if name and surname contains only letters
-                        if(!name.getText().equals("")) {
-	                        if (!name.getText().matches("[a-zA-Z]+")) {
-	                            total_error += "Name must contain only letters!\n";
-	                            flag = true;
-	                        }
-	                        else if (name.getText().equals(newCustomer.getName())) {
-	                            total_error += "Name shouldn't be the same as last  name!\n";
-	                            flag = true;
-	                        }
-	                        else{
-	                        	tempCustomer.setName(name.getText());
-	                        }
+                        if (!name.getText().equals("")) {
+                            if (!name.getText().matches("[a-zA-Z]+")) {
+                                total_error += "Name must contain only letters!\n";
+                                flag = true;
+                            } else if (name.getText().equals(newCustomer.getName())) {
+                                total_error += "Name shouldn't be the same as last  name!\n";
+                                flag = true;
+                            } else {
+                                tempCustomer.setName(name.getText());
+                            }
                         }
-                        
-                        if(!surname.getText().equals("")) {
-	                        if(!surname.getText().matches("[a-zA-Z]+")) {
-	                        	total_error += "Surname must contain only letters!\n";
-	                            flag = true;
-	                        }
-	                        else if (surname.getText().equals(newCustomer.getName())) {
-	                            total_error += "Surname shouldn't be the same as last surname!\n";
-	                            flag = true;
-	                        }
-	                        else{
-	                        	tempCustomer.setSurname(surname.getText());
-	                        }
+
+                        if (!surname.getText().equals("")) {
+                            if (!surname.getText().matches("[a-zA-Z]+")) {
+                                total_error += "Surname must contain only letters!\n";
+                                flag = true;
+                            } else if (surname.getText().equals(newCustomer.getName())) {
+                                total_error += "Surname shouldn't be the same as last surname!\n";
+                                flag = true;
+                            } else {
+                                tempCustomer.setSurname(surname.getText());
+                            }
                         }
                         // Checking if the mail and phone number is valid
-                        if(!mail.getText().equals("")) {
-	                        mail.setText(mail.getText().replaceAll(" ", ""));
-	                        if (!mail.getText().endsWith("@gmail.com") 
-	                        		&& !mail.getText().endsWith("@hotmail.com")
-	                                && !mail.getText().endsWith("@outlook.com") && !mail.getText().endsWith("@yahoo.com")) {
-	                        	
-	                            total_error += "Please enter a valid mail!\n";
-	                            flag = true;
-	                        }
-	                        else if(mail.equals(newCustomer.getMail())){
-	                        	
-	                            total_error += "This mail can not be the same as your last mail!\n";
-	                            flag = true;
-	                        }
+                        if (!mail.getText().equals("")) {
+                            mail.setText(mail.getText().replaceAll(" ", ""));
+                            if (!mail.getText().endsWith("@gmail.com")
+                                    && !mail.getText().endsWith("@hotmail.com")
+                                    && !mail.getText().endsWith("@outlook.com")
+                                    && !mail.getText().endsWith("@yahoo.com")) {
+
+                                total_error += "Please enter a valid mail!\n";
+                                flag = true;
+                            } else if (mail.equals(newCustomer.getMail())) {
+
+                                total_error += "This mail can not be the same as your last mail!\n";
+                                flag = true;
+                            }
                         }
-                        
-                        
+
                         // Checking if the phone number is valid
-                        if(!phoneNumber.getText().equals("")) {
-	                        if ((phoneNumber.getText().length() != 11 
-	                        		|| !phoneNumber.getText().startsWith("0")
-	                                || !phoneNumber.getText().matches("[0-9]+"))) {
-	                            total_error += "Please enter a valid phone number!\n";
-	                            flag = true;
-	                        }
-	                        else if(phoneNumber.equals(newCustomer.getPhoneNumber())){
-	                            total_error += "This phone number can not be the same as your last phone Number!\n";
-	                            flag = true;
-	                        }
+                        if (!phoneNumber.getText().equals("")) {
+                            if ((phoneNumber.getText().length() != 11
+                                    || !phoneNumber.getText().startsWith("0")
+                                    || !phoneNumber.getText().matches("[0-9]+"))) {
+                                total_error += "Please enter a valid phone number!\n";
+                                flag = true;
+                            } else if (phoneNumber.equals(newCustomer.getPhoneNumber())) {
+                                total_error += "This phone number can not be the same as your last phone Number!\n";
+                                flag = true;
+                            }
                         }
-                       
-                        
+
                         // Checking password length
-                        if(!password.getText().equals("")) {
-	                        if (password.getText().length() < 8) {
-	                            total_error += "Password must be at least 8 characters!\n";
-	                            flag = true;
-	                        }
-	                        else if(password.equals(newCustomer.getPassword())){
-	                            total_error += "This password can not be the same as your last password!\n";
-	                            flag = true;
-	                        }
-	                        else{
-	                        	tempCustomer.setPassword(password.getText());
-	                        }
+                        if (!password.getText().equals("")) {
+                            if (password.getText().length() < 8) {
+                                total_error += "Password must be at least 8 characters!\n";
+                                flag = true;
+                            } else if (password.equals(newCustomer.getPassword())) {
+                                total_error += "This password can not be the same as your last password!\n";
+                                flag = true;
+                            } else {
+                                tempCustomer.setPassword(password.getText());
+                            }
                         }
-                        Boolean checkMail=true,checkPhoneNumber=true;
+                        Boolean checkMail = true, checkPhoneNumber = true;
                         // Checking if mail and phone number unique
-                        if(mail.getText().equals("")){
-                        	checkMail=false;
+                        if (mail.getText().equals("")) {
+                            checkMail = false;
                         }
-                    	if(phoneNumber.getText().equals("")){
-                    		checkPhoneNumber=false;
+                        if (phoneNumber.getText().equals("")) {
+                            checkPhoneNumber = false;
                         }
-                    	for(int i = 0; i < mySingleton.getCustomerSize(); i++){
-                            if(checkMail&&mySingleton.getCustomerByIndex(i).getMail().equals(mail.getText())){
+                        for (int i = 0; i < mySingleton.getCustomerSize(); i++) {
+                            if (checkMail && mySingleton.getCustomerByIndex(i).getMail().equals(mail.getText())) {
                                 total_error += "This mail is already used!\n";
                                 flag = true;
                                 break;
                             }
-                            if(checkPhoneNumber&&mySingleton.getCustomerByIndex(i).getPhoneNumber().equals(phoneNumber.getText())){
+                            if (checkPhoneNumber && mySingleton.getCustomerByIndex(i).getPhoneNumber()
+                                    .equals(phoneNumber.getText())) {
                                 total_error += "This phone number is already used!\n";
                                 flag = true;
                                 break;
                             }
-                       }
-                       if(checkMail) { //if mail has changed
-                    	   tempCustomer.setMail(mail.getText());
-                       }
-                       if(checkPhoneNumber) {//if phone number has changed
-                    	   tempCustomer.setPhoneNumber(phoneNumber.getText());
-                       }
-                        if(flag){
-                            JOptionPane.showMessageDialog(null, total_error, "Error", JOptionPane.ERROR_MESSAGE);
                         }
-                        else{
-                        	//Checking which informations has been changed
-                        	mySingleton.removeCustomer(newCustomer);
-                        	mySingleton.addCustomer(tempCustomer);
-                        	newCustomer=tempCustomer;
+                        if (checkMail) { // if mail has changed
+                            tempCustomer.setMail(mail.getText());
+                        }
+                        if (checkPhoneNumber) {// if phone number has changed
+                            tempCustomer.setPhoneNumber(phoneNumber.getText());
+                        }
+                        if (flag) {
+                            JOptionPane.showMessageDialog(null, total_error, "Error", JOptionPane.ERROR_MESSAGE);
+                        } else {
+                            // Checking which informations has been changed
+                            mySingleton.removeCustomer(newCustomer);
+                            mySingleton.addCustomer(tempCustomer);
+                            newCustomer = tempCustomer;
                             AccountSettingsFrame.dispose();
                             frame.setEnabled(true);
-                            JOptionPane.showMessageDialog(null, tempCustomer.getName() , "Success", JOptionPane.INFORMATION_MESSAGE);
+                            JOptionPane.showMessageDialog(null, tempCustomer.getName(), "Success",
+                                    JOptionPane.INFORMATION_MESSAGE);
                         }
                     }
                 });
-                //1/Semarang-Kochi/21.12.2023/11:16-13:44/295/120/
-                //-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1
+                // 1/Semarang-Kochi/21.12.2023/11:16-13:44/295/120/
+                // -1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1;-1
                 AccountSettingsFrame.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent windowEvent) {
@@ -844,6 +993,7 @@ public class op  {
         userInfoLabel.setVisible(false);
         scheduleFlight.setVisible(false);
         buyTicket.setVisible(false);
+        MySchedule.setVisible(false);
         AccountSettings.setVisible(false);
     }
 
@@ -853,9 +1003,10 @@ public class op  {
         logOutButton.setVisible(true);
         userInfoLabel.setVisible(true);
         scheduleFlight.setVisible(true);
+        MySchedule.setVisible(false);
         buyTicket.setVisible(false);
     }
-    
+
     public static void userMenu() {
         logInButton.setVisible(false);
         signUpButton.setVisible(false);
@@ -863,8 +1014,10 @@ public class op  {
         userInfoLabel.setVisible(true);
         scheduleFlight.setVisible(false);
         buyTicket.setVisible(true);
+        MySchedule.setVisible(true);
         AccountSettings.setVisible(true);
+
     }
-   
+
     // ***************************************************************************************************************************
 }
