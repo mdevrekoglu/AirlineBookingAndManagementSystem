@@ -242,4 +242,9 @@ public class MySingleton {
         }
     }
 
+    public flight[] getCustomersFlightsByIndex(int index){
+
+        
+        return null;
+    }
 }

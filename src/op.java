@@ -459,6 +459,7 @@ public class op {
                 scheduleFlightFrame.getContentPane().add(price);
                 price.setColumns(10);
 
+                //!!!!!!!!!!!
                 JLabel capacityLabel = new JLabel("Capacity");
                 capacityLabel.setBounds(55, 317, 85, 20);
                 scheduleFlightFrame.getContentPane().add(capacityLabel);
@@ -477,18 +478,22 @@ public class op {
                 // When the scheduleFlight button is clicked
                 addFlight.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
+
                         boolean flag = false;
                         String total_error = "";
+
                         if (flightNumber.getText().equals("") || destination.getText().equals("")
                                 || date.getText().equals("") || time.getText().equals("")
                                 || price.getText().equals("") || capacity.getText().equals("")) {
                             flag = true;
                             total_error += "Please fill all the fields!\n";
                         }
+
                         if (!flightNumber.getText().matches("[0-9]+")) {
                             total_error += "Flight number must be contains only integer!\n";
                             flag = true;
                         }
+
                         if (!destination.getText().contains("-")) {
                             total_error += "Destination must be filled From-To !\n";
                             flag = true;
@@ -521,17 +526,28 @@ public class op {
                             flag = true;
                         }
 
-                        // Checking if the flight number already exists
-
-                        if ((mySingleton.isFlight(Integer.parseInt(flightNumber.getText()))) != -1) {
-                            JOptionPane.showMessageDialog(null, "Flight number already exists!", "Error",
-                                    JOptionPane.ERROR_MESSAGE);
+                        try {
+                            if (!flag && (mySingleton.isFlight(Integer.parseInt(flightNumber.getText()))) != -1) {
+                                JOptionPane.showMessageDialog(null, "Flight number already exists!", "Error",
+                                        JOptionPane.ERROR_MESSAGE);
+                                flag = true;
+                            }
+                        } catch (Exception e1) {
+                            // TODO: handle exception
                             flag = true;
+                            
+                            System.out.println(e1);
                         }
+                    
+
+                        // Checking if the flight number already exists
                         if (flag) {
                             JOptionPane.showMessageDialog(null, total_error, "Error",
                                     JOptionPane.ERROR_MESSAGE);
                         } else {
+
+
+
                             String parts = date.getText() + "T" + time.getText();
                             int availableSeats = capacity.getText().length();
                             int flightSeats[] = new int[capacity.getText().length()];
@@ -791,6 +807,7 @@ public class op {
 
             }
         });
+        
         AccountSettings.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -1016,7 +1033,6 @@ public class op {
         buyTicket.setVisible(true);
         MySchedule.setVisible(true);
         AccountSettings.setVisible(true);
-
     }
 
     // ***************************************************************************************************************************
