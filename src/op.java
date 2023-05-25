@@ -684,15 +684,15 @@ public class op {
                     public void actionPerformed(ActionEvent e) {
                         String start = startPoint.getText();
                         String end = endPoint.getText();
-                        ArrayList<flight> currenFlights = mySingleton.getFlights(start, end);
-                        Object[][] data = new Object[currenFlights.size()][5];
+                        ArrayList<flight> currentFlights = mySingleton.getFlights(start, end);
+                        Object[][] data = new Object[currentFlights.size()][5];
 
-                        for (int i = 0; i < currenFlights.size(); i++) {
-                            data[i][0] = currenFlights.get(i).getFlightNo();
-                            data[i][1] = currenFlights.get(i).getFlightDestination();
-                            data[i][2] = currenFlights.get(i).getFlightDateTime();
-                            data[i][3] = currenFlights.get(i).getPrice();
-                            data[i][4] = currenFlights.get(i).getAvailableSeats();
+                        for (int i = 0; i < currentFlights.size(); i++) {
+                            data[i][0] = currentFlights.get(i).getFlightNo();
+                            data[i][1] = currentFlights.get(i).getFlightDestination();
+                            data[i][2] = currentFlights.get(i).getFlightDateTime();
+                            data[i][3] = currentFlights.get(i).getPrice();
+                            data[i][4] = currentFlights.get(i).getAvailableSeats();
                         }
 
                         JTable table = new JTable();
@@ -732,14 +732,92 @@ public class op {
                 // When buy button is clicked
                 buy.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        int row = table.getSelectedRow();
+                    	int row = table.getSelectedRow();
                         int flightNo = (int) table.getModel().getValueAt(row, 0);
                         int price = (int) table.getModel().getValueAt(row, 3);
                         int availableSeats = (int) table.getModel().getValueAt(row, 4);
-
                         System.out.println("Flight No: " + flightNo);
                         System.out.println("Price: " + price);
                         System.out.println("Available Seats: " + availableSeats);
+                    	JFrame seatSelectionFrame = new JFrame("Seat Selection");
+                        seatSelectionFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                        seatSelectionFrame.setSize(1920, 1080);
+                        seatSelectionFrame.setLocation(-10, 0);
+                        seatSelectionFrame.getContentPane().setLayout(null);
+                        seatSelectionFrame.setResizable(false);
+                        seatSelectionFrame.setVisible(true);
+                        int index=1;
+                        int [] seatArray = null;
+                        System.out.println("asfasfsaf");
+                        ArrayList<flight> allFlights = mySingleton.getFlights();
+                        for (int j = 1; j < allFlights.size(); j++) {
+							if(allFlights.get(j).getFlightNo()==flightNo) {
+								flight currentFlight=allFlights.get(j);
+								System.out.println(allFlights.get(j).getFlightSeats().length);
+								seatArray=allFlights.get(j).getFlightSeats();
+								break;
+							}
+                        }
+                        JButton[] buttons = new JButton[121];
+                        int x=100;
+                    	int y=20;
+                    	int tempx=x;
+                    	int tempy=y;
+                    	for (int i = 0; i < 20; i++) {
+							y=tempy;
+							x=tempx;
+                        	for (int j = 1; j <= 6; j++) {
+                        		JButton temp = new JButton(String.valueOf(index));
+                        		
+                        		if(j==4) {
+                        			x+=100;
+                        		}
+                        		temp.setBounds(x, y, 70, 25);
+                                seatSelectionFrame.getContentPane().add(temp);
+                                temp.setVisible(true);
+                                if(seatArray[index-1]!=1) {
+                                	temp.setEnabled(true);
+                                }
+                                else {
+                                	temp.setEnabled(false);
+                                }
+                                x+=70;
+                                buttons[index]=temp;
+                                index++;
+    						}
+                        	tempy+=30;
+                    	}
+
+                    	for (int i = 1; i < 121; i++) {
+                    		final int buttonSelection = i;
+                    		 buttons[i].addActionListener(new ActionListener() {
+                                 public void actionPerformed(ActionEvent e) {
+                                	 
+                                     JOptionPane.showMessageDialog(null, "Button " + buttonSelection + "'e tıklandı");
+                                     ArrayList<Integer> flg=newCustomer.getFlights();
+                                     flg.add(flightNo);
+                                     newCustomer.setFlights(flg);
+                                     for (int element : flg) {
+                                         System.out.println(element);
+                                     }
+                                    
+                                    
+                                     for (int j = 1; j < allFlights.size(); j++) {
+										if(allFlights.get(j).getFlightNo()==flightNo) {
+											int [] seats=allFlights.get(j).getFlightSeats();
+											seats[buttonSelection-1]=1;
+											////////////////!!!!!!!!!!!!!!!! seats stringe dönüştürülecek.
+											//seats[buttonSelection-1]=newCustomer.getPhoneNumber();  // SEAT SELECTED
+											mySingleton.flightWriter();
+											mySingleton.customerWriter();
+											break;
+										}
+									}
+                                     seatSelectionFrame.dispose();
+                                     buyTicketFrame.dispose();
+                                 }
+                             });
+						}
 
                     }
                 });
@@ -973,6 +1051,7 @@ public class op {
                         }
                         if (checkPhoneNumber) {// if phone number has changed
                             tempCustomer.setPhoneNumber(phoneNumber.getText());
+                            ///////////!!!!!!!!!!!!!!!!!!!!!!!!! kullanıcıların flightları burda değiştirilecek
                         }
                         if (flag) {
                             JOptionPane.showMessageDialog(null, total_error, "Error", JOptionPane.ERROR_MESSAGE);
