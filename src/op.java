@@ -1124,7 +1124,7 @@ public class op {
                             AccountSettingsFrame.dispose();
                             frame.setEnabled(true);
                             mySingleton.customerWriter();
-                            JOptionPane.showMessageDialog(null, tempCustomer.getName(), "Success",
+                            JOptionPane.showMessageDialog(null, tempCustomer.getName()+" deleted", "Success",
                                     JOptionPane.INFORMATION_MESSAGE);
                         }
                     }
@@ -1153,7 +1153,7 @@ public class op {
                 removeUserFrame.setResizable(false);
                 removeUserFrame.setVisible(true);
 
-                JLabel flightNumberLabel = new JLabel("User Phone Number");
+                JLabel flightNumberLabel = new JLabel("Enter User Data");
                 flightNumberLabel.setBounds(55, 91, 188, 20);
                 removeUserFrame.getContentPane().add(flightNumberLabel);
                 
@@ -1201,6 +1201,7 @@ public class op {
                     		mySingleton.removeCustomer(temp);
                     		mySingleton.flightWriter();
 							mySingleton.customerWriter();
+							JOptionPane.showMessageDialog(null, temp.getName()+" was deleted","Error", JOptionPane.ERROR_MESSAGE);
                     	}
                     	removeFrame.dispose();
                     	removeUserFrame.dispose();
