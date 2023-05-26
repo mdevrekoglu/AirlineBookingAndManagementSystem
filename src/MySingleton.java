@@ -11,8 +11,8 @@ public class MySingleton {
     private static MySingleton instance = null;
     private ArrayList<customer> customers;
     private ArrayList<flight> flights;
-    private String customersFilePath = "customers.txt";
-    private String flightsFilePath = "flights.txt";
+    private String customersFilePath = "C:\\Users\\Arda\\eclipse-workspace\\Airline\\AirlineBookingAndManagementSystem\\customers.txt";
+    private String flightsFilePath = "C:\\Users\\Arda\\eclipse-workspace\\Airline\\AirlineBookingAndManagementSystem\\flights.txt";
 
     private MySingleton() {
         customers = new ArrayList<customer>();

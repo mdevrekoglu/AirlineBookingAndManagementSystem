@@ -810,18 +810,16 @@ public class op {
                                 public void actionPerformed(ActionEvent e) {
 
                                     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                                    JOptionPane.showMessageDialog(null, "Button " + buttonSelection + "'e tıklandı");
+                                    JOptionPane.showMessageDialog(null, "Seat " + buttonSelection + " taken");
                                     ArrayList<Integer> flg = currentCustomer.getFlights();
                                     flg.add(flightNo);
                                     currentCustomer.setFlights(flg);
-                                    for (int element : flg) {
-                                        System.out.println(element);
-                                    }
+                                    
 
 
                                     seatArray[buttonSelection - 1] = currentCustomer.getPhoneNumber();
                                     currentFlight.setFlightSeats(seatArray);
-
+                                    currentFlight.setAvailableSeats(currentFlight.getAvailableSeats()-1);
                                     mySingleton.flightWriter();
                                     mySingleton.customerWriter();
 
@@ -1070,7 +1068,19 @@ public class op {
                             tempCustomer.setMail(mail.getText());
                         }
                         if (checkPhoneNumber) {// if phone number has changed
+                        	ArrayList<Integer> customerFlights = currentCustomer.getFlights();
+                        	for (int i = 0; i < customerFlights.size(); i++) {
+								flight temp=mySingleton.getFlightByFlightNo(customerFlights.get(i));
+								String []seats=temp.getFlightSeats();
+								for (int j = 0; j < seats.length; j++) {
+									if(seats[j].equals(tempCustomer.getPhoneNumber())) {
+										seats[j]=phoneNumber.getText();
+									}
+								}
+							}
+                        	mySingleton.flightWriter();
                             tempCustomer.setPhoneNumber(phoneNumber.getText());
+                            
                             /////////// !!!!!!!!!!!!!!!!!!!!!!!!! kullanıcıların flightları burda
                             /////////// değiştirilecek
                         }
@@ -1083,6 +1093,7 @@ public class op {
                             currentCustomer = tempCustomer;
                             AccountSettingsFrame.dispose();
                             frame.setEnabled(true);
+                            mySingleton.customerWriter();
                             JOptionPane.showMessageDialog(null, tempCustomer.getName(), "Success",
                                     JOptionPane.INFORMATION_MESSAGE);
                         }
