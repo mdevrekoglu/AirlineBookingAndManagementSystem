@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public class customer {
+public class customer implements customerInterface{
     
     private String name;
     private String surname;

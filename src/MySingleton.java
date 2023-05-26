@@ -11,8 +11,8 @@ public class MySingleton {
     private static MySingleton instance = null;
     private ArrayList<customer> customers;
     private ArrayList<flight> flights;
-    private String customersFilePath = "C:\\Users\\Arda\\eclipse-workspace\\Airline\\AirlineBookingAndManagementSystem\\customers.txt";
-    private String flightsFilePath = "C:\\Users\\Arda\\eclipse-workspace\\Airline\\AirlineBookingAndManagementSystem\\flights.txt";
+    private String customersFilePath = "customers.txt";
+    private String flightsFilePath = "flights.txt";
 
     private MySingleton() {
         customers = new ArrayList<customer>();
@@ -37,17 +37,21 @@ public class MySingleton {
         return flights;
     }
 
-    public ArrayList<flight> getFlights(String start, String end){
+    public ArrayList<flight> getFlights(String start, String end, int minPrice, int maxPrice){
         ArrayList <flight> temp = new ArrayList<flight>();
 
         Boolean cond1 = start.equals("") ? true : false;
         Boolean cond2 = end.equals("") ? true : false;
+        Boolean cond3 = minPrice == 0 ? true : false;
+        Boolean cond4 = maxPrice == 0 ? true : false;
+
 
         // Get flights with given start and end points and available seats and flight date is after now
         for (flight flight : flights) {
             if((cond1 || flight.getFlightDestination().split("-")[0].equalsIgnoreCase(start)) 
                 && (cond2 || flight.getFlightDestination().split("-")[1].equalsIgnoreCase(end))
-                && flight.getAvailableSeats() > 0 && flight.getFlightDateTime().isAfter(LocalDateTime.now())){
+                && flight.getAvailableSeats() > 0 && flight.getFlightDateTime().isAfter(LocalDateTime.now())
+                && (cond3 || flight.getPrice() >= minPrice) && (cond4 || flight.getPrice() <= maxPrice)){
                 temp.add(flight);
             }
         }

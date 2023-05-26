@@ -1,6 +1,6 @@
 import java.time.LocalDateTime;
 
-public class flight {
+public class flight implements flightInterface{
     
     private int flightNo;
     private String flightDestination;

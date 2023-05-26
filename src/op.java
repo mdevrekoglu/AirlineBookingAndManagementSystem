@@ -586,7 +586,7 @@ public class op {
                 buyTicketFrame.getContentPane().add(scrollPane);
 
                 MySingleton mySingleton = MySingleton.getInstance();
-                ArrayList<flight> currenFlights = mySingleton.getFlights("", "");
+                ArrayList<flight> currenFlights = mySingleton.getFlights("", "", 0, 0);
                 Object[][] data = new Object[currenFlights.size()][5];
 
                 for (int i = 0; i < currenFlights.size(); i++) {
@@ -629,6 +629,7 @@ public class op {
                 table.getColumnModel().getColumn(4).setPreferredWidth(90);
                 scrollPane.setViewportView(table);
                 table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+                table.getTableHeader().setReorderingAllowed(false);
 
                 // Start Point
                 JLabel startPointLabel = new JLabel("Start Point");
@@ -652,36 +653,61 @@ public class op {
                 buyTicketFrame.getContentPane().add(endPoint);
                 endPoint.setColumns(20);
 
+                // Min Price
+                JLabel minPriceLabel = new JLabel("Min Price");
+                minPriceLabel.setBounds(900, 190, 85, 20);
+                buyTicketFrame.getContentPane().add(minPriceLabel);
+                buyTicketFrame.setVisible(true);
+
+                JTextField minPrice = new JTextField();
+                minPrice.setBounds(900, 220, 146, 26);
+                buyTicketFrame.getContentPane().add(minPrice);
+                minPrice.setColumns(20);
+
+                // Max Price
+                JLabel maxPriceLabel = new JLabel("Max Price");
+                maxPriceLabel.setBounds(900, 260, 85, 20);
+                buyTicketFrame.getContentPane().add(maxPriceLabel);
+                buyTicketFrame.setVisible(true);
+
+                JTextField maxPrice = new JTextField();
+                maxPrice.setBounds(900, 290, 146, 26);
+                buyTicketFrame.getContentPane().add(maxPrice);
+                maxPrice.setColumns(20);
+
                 // Update button
                 JButton update = new JButton("Update");
-                update.setBounds(900, 200, 115, 29);
+                update.setBounds(900, 340, 115, 29);
                 buyTicketFrame.getContentPane().add(update);
                 buyTicketFrame.setVisible(true);
 
-                clockLabel.setBounds(900, 750, 200, 50);
-                buyTicketFrame.getContentPane().add(clockLabel);
-                clockLabel.setVisible(true);
-                clock();
-
                 // Buy button
                 JButton buy = new JButton("Buy");
-                buy.setBounds(900, 250, 115, 29);
+                buy.setBounds(900, 380, 115, 29);
                 buyTicketFrame.getContentPane().add(buy);
                 buyTicketFrame.setVisible(true);
 
                 // Back button
                 JButton back = new JButton("Back");
-                back.setBounds(900, 300, 115, 29);
+                back.setBounds(900, 420, 115, 29);
                 buyTicketFrame.getContentPane().add(back);
                 buyTicketFrame.setVisible(true);
 
+                // Clock
+                clockLabel.setBounds(900, 10, 200, 20);
+                buyTicketFrame.getContentPane().add(clockLabel);
+                clockLabel.setVisible(true);
+                clock();
 
                 // When update button is clicked
                 update.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         String start = startPoint.getText();
                         String end = endPoint.getText();
-                        ArrayList<flight> currentFlights = mySingleton.getFlights(start, end);
+                        int min = (minPrice.getText().equals("")) ? 0 : Integer.parseInt(minPrice.getText());
+                        int max = (maxPrice.getText().equals("")) ? 0 : Integer.parseInt(maxPrice.getText());
+
+                        ArrayList<flight> currentFlights = mySingleton.getFlights(start, end, min, max);
                         Object[][] data = new Object[currentFlights.size()][5];
 
                         for (int i = 0; i < currentFlights.size(); i++) {
@@ -723,6 +749,8 @@ public class op {
                         table.getColumnModel().getColumn(4).setResizable(false);
                         table.getColumnModel().getColumn(4).setPreferredWidth(90);
                         scrollPane.setViewportView(table);
+                        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+                        table.getTableHeader().setReorderingAllowed(false);
                     }
                 });
 
@@ -815,8 +843,6 @@ public class op {
                                     flg.add(flightNo);
                                     currentCustomer.setFlights(flg);
                                     
-
-
                                     seatArray[buttonSelection - 1] = currentCustomer.getPhoneNumber();
                                     currentFlight.setFlightSeats(seatArray);
                                     currentFlight.setAvailableSeats(currentFlight.getAvailableSeats()-1);
