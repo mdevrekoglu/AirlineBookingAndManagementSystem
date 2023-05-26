@@ -5,15 +5,14 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Queue;
 
 public class MySingleton {
 
     private static MySingleton instance = null;
     private ArrayList<customer> customers;
     private ArrayList<flight> flights;
-    private String customersFilePath = "C:\\Users\\Arda\\eclipse-workspace\\Airline\\AirlineBookingAndManagementSystem\\customers.txt";
-    private String flightsFilePath = "C:\\Users\\Arda\\eclipse-workspace\\Airline\\AirlineBookingAndManagementSystem\\flights.txt";
+    private String customersFilePath = "customers.txt";
+    private String flightsFilePath = "flights.txt";
 
     private MySingleton() {
         customers = new ArrayList<customer>();
@@ -82,6 +81,16 @@ public class MySingleton {
 
     public flight getFlightByIndex(int index){
         return flights.get(index);
+    }
+
+    public flight getFlightByFlightNo(int flightNo){
+        for (flight flight : flights) {
+            if(flight.getFlightNo() == flightNo){
+                return flight;
+            }
+        }
+
+        return null;
     }
 
     public int getCustomerSize(){
@@ -188,13 +197,8 @@ public class MySingleton {
                 String[] parts = line.split("/");
                 String[] seats = parts[5].split(";");
 
-                int[] seatsInt = new int[120];
-                for (int i = 0; i < seats.length; i++) {
-                    seatsInt[i] = Integer.parseInt(seats[i]);
-                }
-
                 flight newFlight = new flight(Integer.parseInt(parts[0]), parts[1], parts[2],
-                        Integer.parseInt(parts[3]), Integer.parseInt(parts[4]), seatsInt);
+                        Integer.parseInt(parts[3]), Integer.parseInt(parts[4]), seats);
                 flights.add(newFlight);
 
                 line = reader.readLine();
@@ -240,11 +244,5 @@ public class MySingleton {
             e2.printStackTrace();
             System.exit(0);
         }
-    }
-
-    public flight[] getCustomersFlightsByIndex(int index){
-
-        
-        return null;
     }
 }

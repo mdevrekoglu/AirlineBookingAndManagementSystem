@@ -52,6 +52,8 @@ customers = []
 customers.append("Mehmet/Devrekoglu/mehmetdevrekoglu01@gmail.com/123456789/05437280031/1/;")
 customers.append("Fatih/Bahcecioglu/fatih@gmail.com/123456789/05050172082/1/;")
 customers.append("Arda/Aslaner/arda@gmail.com/123456789/05050172084/1/;")
+customers.append("a/a/a@gmail.com/a/a/0/;")
+customers.append("b/b/b@gmail.com/b/b/1/;")
 
 for i in range(1000):
     # Generate a random name

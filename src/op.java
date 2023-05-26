@@ -1,36 +1,27 @@
-import java.awt.BorderLayout;
+
 import java.awt.Color;
-import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Date;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-
-import javax.security.auth.x500.X500Principal;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.border.EmptyBorder;
+import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
 
 public class op {
 
-    // create a string array list
+    // Singleton
     private MySingleton mySingleton = MySingleton.getInstance();
-    private static int loggedInUserIndex = -1;
-    private static customer newCustomer;
+    private static customer currentCustomer = null;
+
     // Main Frame
     private static JFrame frame = new JFrame("Airline Booking and Management System");
 
@@ -134,6 +125,7 @@ public class op {
                 // Set main menu unavailable
                 frame.setEnabled(false);
 
+                // Log In Frame
                 JFrame logInFrame = new JFrame("Log In");
                 logInFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                 logInFrame.setSize(500, 500);
@@ -175,9 +167,8 @@ public class op {
                         // Check if user exists
                         if (index != -1) {
                             if (mySingleton.getCustomerByIndex(index).getPassword().equals(passport.getText())) {
-                                loggedInUserIndex = index;
                                 frame.setEnabled(true);
-                                newCustomer = mySingleton.getCustomerByIndex(index);
+                                currentCustomer = mySingleton.getCustomerByIndex(index);
                                 logInFrame.dispose();
 
                                 // Show welcome message
@@ -229,6 +220,7 @@ public class op {
                 // Set main menu unavailable
                 frame.setEnabled(false);
 
+                // Sign Up Frame
                 JFrame signUpFrame = new JFrame("Sign Up");
                 signUpFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                 signUpFrame.setSize(500, 600);
@@ -390,7 +382,7 @@ public class op {
         logOutButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                loggedInUserIndex = -1;
+                currentCustomer = null;
                 mainMenu();
                 userInfoLabel.setText("");
             }
@@ -459,7 +451,7 @@ public class op {
                 scheduleFlightFrame.getContentPane().add(price);
                 price.setColumns(10);
 
-                //!!!!!!!!!!!
+                // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 JLabel capacityLabel = new JLabel("Capacity");
                 capacityLabel.setBounds(55, 317, 85, 20);
                 scheduleFlightFrame.getContentPane().add(capacityLabel);
@@ -535,10 +527,9 @@ public class op {
                         } catch (Exception e1) {
                             // TODO: handle exception
                             flag = true;
-                            
+
                             System.out.println(e1);
                         }
-                    
 
                         // Checking if the flight number already exists
                         if (flag) {
@@ -546,11 +537,9 @@ public class op {
                                     JOptionPane.ERROR_MESSAGE);
                         } else {
 
-
-
                             String parts = date.getText() + "T" + time.getText();
                             int availableSeats = capacity.getText().length();
-                            int flightSeats[] = new int[capacity.getText().length()];
+                            String flightSeats[] = new String[capacity.getText().length()];
                             mySingleton.addFlight(
                                     new flight(Integer.parseInt(flightNumber.getText()), destination.getText(), parts,
                                             Integer.parseInt(price.getText()), availableSeats, flightSeats));
@@ -639,6 +628,7 @@ public class op {
                 table.getColumnModel().getColumn(4).setResizable(false);
                 table.getColumnModel().getColumn(4).setPreferredWidth(90);
                 scrollPane.setViewportView(table);
+                table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
                 // Start Point
                 JLabel startPointLabel = new JLabel("Start Point");
@@ -678,6 +668,13 @@ public class op {
                 buy.setBounds(900, 250, 115, 29);
                 buyTicketFrame.getContentPane().add(buy);
                 buyTicketFrame.setVisible(true);
+
+                // Back button
+                JButton back = new JButton("Back");
+                back.setBounds(900, 300, 115, 29);
+                buyTicketFrame.getContentPane().add(back);
+                buyTicketFrame.setVisible(true);
+
 
                 // When update button is clicked
                 update.addActionListener(new ActionListener() {
@@ -732,92 +729,108 @@ public class op {
                 // When buy button is clicked
                 buy.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                    	int row = table.getSelectedRow();
+                        int row = table.getSelectedRow();
                         int flightNo = (int) table.getModel().getValueAt(row, 0);
                         int price = (int) table.getModel().getValueAt(row, 3);
                         int availableSeats = (int) table.getModel().getValueAt(row, 4);
                         System.out.println("Flight No: " + flightNo);
                         System.out.println("Price: " + price);
                         System.out.println("Available Seats: " + availableSeats);
-                    	JFrame seatSelectionFrame = new JFrame("Seat Selection");
+                        JFrame seatSelectionFrame = new JFrame("Seat Selection");
                         seatSelectionFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                         seatSelectionFrame.setSize(1920, 1080);
                         seatSelectionFrame.setLocation(-10, 0);
                         seatSelectionFrame.getContentPane().setLayout(null);
                         seatSelectionFrame.setResizable(false);
                         seatSelectionFrame.setVisible(true);
-                        int index=1;
-                        int [] seatArray = null;
-                        System.out.println("asfasfsaf");
-                        ArrayList<flight> allFlights = mySingleton.getFlights();
-                        for (int j = 1; j < allFlights.size(); j++) {
-							if(allFlights.get(j).getFlightNo()==flightNo) {
-								flight currentFlight=allFlights.get(j);
-								System.out.println(allFlights.get(j).getFlightSeats().length);
-								seatArray=allFlights.get(j).getFlightSeats();
-								break;
-							}
-                        }
+                        int index = 1;
+
+                        // Back button
+                        JButton back = new JButton("Back");
+                        back.setBounds(900, 300, 115, 29);
+                        seatSelectionFrame.getContentPane().add(back);
+                        seatSelectionFrame.setVisible(true);
+
+                        // When back button is clicked
+                        back.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent e) {
+                                seatSelectionFrame.dispose();
+
+                            }
+                        });
+
+                        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                        flight currentFlight = mySingleton.getFlightByFlightNo(flightNo);
+                        String[] seatArray = currentFlight.getFlightSeats();
+
+                        /*
+                         * for (int j = 1; j < allFlights.size(); j++) {
+                         * if(allFlights.get(j).getFlightNo()==flightNo) {
+                         * flight currentFlight=allFlights.get(j);
+                         * System.out.println(allFlights.get(j).getFlightSeats().length);
+                         * seatArray=allFlights.get(j).getFlightSeats();
+                         * break;
+                         * }
+                         * }
+                         */
+                        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BACK BUTTON!!!!!!!!!!!!!!!!!!!
+
                         JButton[] buttons = new JButton[121];
-                        int x=100;
-                    	int y=20;
-                    	int tempx=x;
-                    	int tempy=y;
-                    	for (int i = 0; i < 20; i++) {
-							y=tempy;
-							x=tempx;
-                        	for (int j = 1; j <= 6; j++) {
-                        		JButton temp = new JButton(String.valueOf(index));
-                        		
-                        		if(j==4) {
-                        			x+=100;
-                        		}
-                        		temp.setBounds(x, y, 70, 25);
+                        int x = 100;
+                        int y = 20;
+                        int tempx = x;
+                        int tempy = y;
+                        for (int i = 0; i < 20; i++) {
+                            y = tempy;
+                            x = tempx;
+                            for (int j = 1; j <= 6; j++) {
+                                JButton temp = new JButton(String.valueOf(index));
+
+                                if (j == 4) {
+                                    x += 100;
+                                }
+                                temp.setBounds(x, y, 70, 25);
                                 seatSelectionFrame.getContentPane().add(temp);
                                 temp.setVisible(true);
-                                if(seatArray[index-1]!=1) {
-                                	temp.setEnabled(true);
+                                if (seatArray[index - 1].equals("-1")) {
+                                    temp.setEnabled(true);
+                                } else {
+                                    temp.setEnabled(false);
                                 }
-                                else {
-                                	temp.setEnabled(false);
-                                }
-                                x+=70;
-                                buttons[index]=temp;
+                                x += 70;
+                                buttons[index] = temp;
                                 index++;
-    						}
-                        	tempy+=30;
-                    	}
+                            }
+                            tempy += 30;
+                        }
 
-                    	for (int i = 1; i < 121; i++) {
-                    		final int buttonSelection = i;
-                    		 buttons[i].addActionListener(new ActionListener() {
-                                 public void actionPerformed(ActionEvent e) {
-                                	 
-                                     JOptionPane.showMessageDialog(null, "Button " + buttonSelection + "'e tıklandı");
-                                     ArrayList<Integer> flg=newCustomer.getFlights();
-                                     flg.add(flightNo);
-                                     newCustomer.setFlights(flg);
-                                     for (int element : flg) {
-                                         System.out.println(element);
-                                     }
-                                    
-                                    
-                                     for (int j = 1; j < allFlights.size(); j++) {
-										if(allFlights.get(j).getFlightNo()==flightNo) {
-											int [] seats=allFlights.get(j).getFlightSeats();
-											seats[buttonSelection-1]=1;
-											////////////////!!!!!!!!!!!!!!!! seats stringe dönüştürülecek.
-											//seats[buttonSelection-1]=newCustomer.getPhoneNumber();  // SEAT SELECTED
-											mySingleton.flightWriter();
-											mySingleton.customerWriter();
-											break;
-										}
-									}
-                                     seatSelectionFrame.dispose();
-                                     buyTicketFrame.dispose();
-                                 }
-                             });
-						}
+                        for (int i = 1; i < 121; i++) {
+                            final int buttonSelection = i;
+                            buttons[i].addActionListener(new ActionListener() {
+                                public void actionPerformed(ActionEvent e) {
+
+                                    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                                    JOptionPane.showMessageDialog(null, "Button " + buttonSelection + "'e tıklandı");
+                                    ArrayList<Integer> flg = currentCustomer.getFlights();
+                                    flg.add(flightNo);
+                                    currentCustomer.setFlights(flg);
+                                    for (int element : flg) {
+                                        System.out.println(element);
+                                    }
+
+
+                                    seatArray[buttonSelection - 1] = currentCustomer.getPhoneNumber();
+                                    currentFlight.setFlightSeats(seatArray);
+
+                                    mySingleton.flightWriter();
+                                    mySingleton.customerWriter();
+
+                                    seatSelectionFrame.dispose();
+                                    buyTicketFrame.dispose();
+                                    frame.setEnabled(true);
+                                }
+                            });
+                        }
 
                     }
                 });
@@ -826,6 +839,14 @@ public class op {
                 buyTicketFrame.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                        frame.setEnabled(true);
+                    }
+                });
+
+                // When back button is clicked
+                back.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        buyTicketFrame.dispose();
                         frame.setEnabled(true);
                     }
                 });
@@ -862,11 +883,10 @@ public class op {
 
                 scrollPane.setViewportView(MyScheduleTable);
 
-                //MySingleton mySingleton = MySingleton.getInstance();
-               // ArrayList<flight> customersFlights = mySingleton.getCustomersFlights();
-               // mySingleton.get
-               //loggedInUserIndex
-               
+                // MySingleton mySingleton = MySingleton.getInstance();
+                // ArrayList<flight> customersFlights = mySingleton.getCustomersFlights();
+                // mySingleton.get
+                // loggedInUserIndex
 
                 String[] columnNames = { "Flight No", "Flight Date and Hour", "Seat No " };
                 String[][] data = { { "1", "2", "3" }, { "4", "5", "6" }, { "7", "8", "9" } };
@@ -885,7 +905,7 @@ public class op {
 
             }
         });
-        
+
         AccountSettings.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -957,14 +977,14 @@ public class op {
 
                         Boolean flag = false;
                         String total_error = "";
-                        customer tempCustomer = newCustomer;
+                        customer tempCustomer = currentCustomer;
 
                         // Check if name and surname contains only letters
                         if (!name.getText().equals("")) {
                             if (!name.getText().matches("[a-zA-Z]+")) {
                                 total_error += "Name must contain only letters!\n";
                                 flag = true;
-                            } else if (name.getText().equals(newCustomer.getName())) {
+                            } else if (name.getText().equals(currentCustomer.getName())) {
                                 total_error += "Name shouldn't be the same as last  name!\n";
                                 flag = true;
                             } else {
@@ -976,7 +996,7 @@ public class op {
                             if (!surname.getText().matches("[a-zA-Z]+")) {
                                 total_error += "Surname must contain only letters!\n";
                                 flag = true;
-                            } else if (surname.getText().equals(newCustomer.getName())) {
+                            } else if (surname.getText().equals(currentCustomer.getName())) {
                                 total_error += "Surname shouldn't be the same as last surname!\n";
                                 flag = true;
                             } else {
@@ -993,7 +1013,7 @@ public class op {
 
                                 total_error += "Please enter a valid mail!\n";
                                 flag = true;
-                            } else if (mail.equals(newCustomer.getMail())) {
+                            } else if (mail.equals(currentCustomer.getMail())) {
 
                                 total_error += "This mail can not be the same as your last mail!\n";
                                 flag = true;
@@ -1007,7 +1027,7 @@ public class op {
                                     || !phoneNumber.getText().matches("[0-9]+"))) {
                                 total_error += "Please enter a valid phone number!\n";
                                 flag = true;
-                            } else if (phoneNumber.equals(newCustomer.getPhoneNumber())) {
+                            } else if (phoneNumber.equals(currentCustomer.getPhoneNumber())) {
                                 total_error += "This phone number can not be the same as your last phone Number!\n";
                                 flag = true;
                             }
@@ -1018,7 +1038,7 @@ public class op {
                             if (password.getText().length() < 8) {
                                 total_error += "Password must be at least 8 characters!\n";
                                 flag = true;
-                            } else if (password.equals(newCustomer.getPassword())) {
+                            } else if (password.equals(currentCustomer.getPassword())) {
                                 total_error += "This password can not be the same as your last password!\n";
                                 flag = true;
                             } else {
@@ -1051,15 +1071,16 @@ public class op {
                         }
                         if (checkPhoneNumber) {// if phone number has changed
                             tempCustomer.setPhoneNumber(phoneNumber.getText());
-                            ///////////!!!!!!!!!!!!!!!!!!!!!!!!! kullanıcıların flightları burda değiştirilecek
+                            /////////// !!!!!!!!!!!!!!!!!!!!!!!!! kullanıcıların flightları burda
+                            /////////// değiştirilecek
                         }
                         if (flag) {
                             JOptionPane.showMessageDialog(null, total_error, "Error", JOptionPane.ERROR_MESSAGE);
                         } else {
                             // Checking which informations has been changed
-                            mySingleton.removeCustomer(newCustomer);
+                            mySingleton.removeCustomer(currentCustomer);
                             mySingleton.addCustomer(tempCustomer);
-                            newCustomer = tempCustomer;
+                            currentCustomer = tempCustomer;
                             AccountSettingsFrame.dispose();
                             frame.setEnabled(true);
                             JOptionPane.showMessageDialog(null, tempCustomer.getName(), "Success",

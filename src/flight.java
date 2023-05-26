@@ -7,9 +7,9 @@ public class flight {
     private LocalDateTime flightDateTime;
     private int price;
     private int availableSeats;
-    private int[] flightSeats;
+    private String[] flightSeats;
 
-    public flight(int flightNo, String flightDestination, String flightDateTime, int price, int availableSeats, int[] flightSeats) {
+    public flight(int flightNo, String flightDestination, String flightDateTime, int price, int availableSeats, String[] flightSeats) {
         this.flightNo = flightNo;
         this.flightDestination = flightDestination;
 
@@ -55,11 +55,11 @@ public class flight {
         this.availableSeats = availableSeats;
     }
 
-    public int[] getFlightSeats() {
+    public String[] getFlightSeats() {
         return flightSeats;
     }
 
-    public void setFlightSeats(int[] flightSeats) {
+    public void setFlightSeats(String[] flightSeats) {
         this.flightSeats = flightSeats;
     }
 

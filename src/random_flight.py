@@ -53,7 +53,7 @@ for i in range(10000):
     available_seats = 120
     
     # Generate a random list of -1's and 1's for the seat availability in the next 100 minutes
-    seat_availability = ';'.join(["-1" for i in range(100)])
+    seat_availability = ';'.join(["-1" for i in range(120)])
     
     # Combine all the data into a string in the specified format
     flight_data = f"{flightNo}/{destination}/{date}T{flying_time}/{price}/{available_seats}/{seat_availability}"
