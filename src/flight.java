@@ -34,7 +34,6 @@ public class flight implements flightInterface{
     public String getFlightDestination() {
         return flightDestination;
     }
-
     public void setFlightDestination(String flightDestination) {
         this.flightDestination = flightDestination;
     }

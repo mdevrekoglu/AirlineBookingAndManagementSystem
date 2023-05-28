@@ -112,15 +112,15 @@ public class op {
         MySchedule.setBounds(160, 200, 150, 30);
         frame.getContentPane().add(MySchedule);
         MySchedule.setVisible(false);
-        
+
         removeUser.setBounds(160, 200, 150, 30);
         frame.getContentPane().add(removeUser);
         removeUser.setVisible(false);
-        
+
         removeFlight.setBounds(160, 250, 150, 30);
         frame.getContentPane().add(removeFlight);
         removeFlight.setVisible(false);
-        
+
         AccountSettings.setBounds(160, 250, 150, 30);
         frame.getContentPane().add(AccountSettings);
         AccountSettings.setVisible(false);
@@ -507,15 +507,6 @@ public class op {
                         }
                         if (!time.getText().equals("\\d{2}:\\d{2}")
                                 || !time.getText().contains(":")) {
-                            // String[] check_time=time.getText().split(":");
-                            // if(Integer.parseInt(check_time[0])>24||Integer.parseInt(check_time[0])<0)
-                            // total_error +="Hour must be between 00-24!\n";
-                            // else
-                            // if(Integer.parseInt(check_time[1])<0||Integer.parseInt(check_time[1])>59)
-                            // total_error +="Minute must be between 00-59!\n";
-                            // else
-                            // total_error += "Time must be filled HH:MM !\n"; CTRL+K CTRL+U YORUM SATIRINI
-                            // TOPLU KALDIRIR
                             total_error += "Time must be filled HH:MM !\n";
                             flag = true;
                         }
@@ -808,7 +799,7 @@ public class op {
                          * }
                          * }
                          */
-                        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BACK BUTTON!!!!!!!!!!!!!!!!!!!
+                        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BACK BUTTON!!!!!!!!!!!!!!!!!!!
 
                         JButton[] buttons = new JButton[121];
                         int x = 100;
@@ -844,15 +835,15 @@ public class op {
                             buttons[i].addActionListener(new ActionListener() {
                                 public void actionPerformed(ActionEvent e) {
 
-                                    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                                    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                                     JOptionPane.showMessageDialog(null, "Seat " + buttonSelection + " taken");
                                     ArrayList<Integer> flg = currentCustomer.getFlights();
                                     flg.add(flightNo);
                                     currentCustomer.setFlights(flg);
-                                    
+
                                     seatArray[buttonSelection - 1] = currentCustomer.getPhoneNumber();
                                     currentFlight.setFlightSeats(seatArray);
-                                    currentFlight.setAvailableSeats(currentFlight.getAvailableSeats()-1);
+                                    currentFlight.setAvailableSeats(currentFlight.getAvailableSeats() - 1);
                                     mySingleton.flightWriter();
                                     mySingleton.customerWriter();
 
@@ -919,14 +910,36 @@ public class op {
                 // mySingleton.get
                 // loggedInUserIndex
 
-                String[] columnNames = { "Flight No", "Flight Date and Hour", "Seat No " };
-                String[][] data = { { "1", "2", "3" }, { "4", "5", "6" }, { "7", "8", "9" } };
+                String[] columnNames = { "Flight No", "From-To", "Date" };
+                String[][] data = new String[100][3];
+                ArrayList<Integer> customerFlights = currentCustomer.getFlights();
+                MySingleton mySingleton = MySingleton.getInstance();
+                int i = 0;
+                String[] temp = new String[customerFlights.size()];
+                String[] fromto = new String[customerFlights.size()];
+                for (Integer flightNo : customerFlights) {
+                    if (mySingleton.getFlightByFlightNo(flightNo) != null) {
+                        fromto[i] = mySingleton.getFlightByFlightNo(flightNo).getFlightDestination();
+                        temp[i] = mySingleton.getFlightByFlightNo(flightNo).getFlightDateTimeString();
+                        System.out.println(temp);
+                        i++;
+                    }
+                }
+
+                for (int j = 0; j < customerFlights.size(); j++) {
+                    data[j][0] = String.valueOf(customerFlights.get(j));
+                    data[j][1] = fromto[j];
+                    data[j][2] = temp[j];
+                }
+
                 MyScheduleTable.setModel(new DefaultTableModel(data, columnNames));
                 MyScheduleTable.setDefaultEditor(getClass(), null);
                 MyScheduleTable.setEnabled(false); // to disable table editing
                 MyScheduleTable.getColumnModel().getColumn(0).setResizable(false);
-                MyScheduleTable.getColumnModel().getColumn(1).setPreferredWidth(261);
+                MyScheduleTable.getColumnModel().getColumn(0).setPreferredWidth(50);
+                MyScheduleTable.getColumnModel().getColumn(1).setPreferredWidth(200);
                 MyScheduleTable.getColumnModel().getColumn(2).setResizable(false);
+                MyScheduleTable.getColumnModel().getColumn(2).setPreferredWidth(100);
 
                 MyScheduleFrame.setVisible(true);
 
@@ -1101,17 +1114,17 @@ public class op {
                             tempCustomer.setMail(mail.getText());
                         }
                         if (checkPhoneNumber) {// if phone number has changed
-                        	ArrayList<Integer> customerFlights = currentCustomer.getFlights();
-                        	for (int i = 0; i < customerFlights.size(); i++) {
-								flight temp=mySingleton.getFlightByFlightNo(customerFlights.get(i));
-								String []seats=temp.getFlightSeats();
-								for (int j = 0; j < seats.length; j++) {
-									if(seats[j].equals(tempCustomer.getPhoneNumber())) {
-										seats[j]=phoneNumber.getText();
-									}
-								}
-							}
-                        	mySingleton.flightWriter();
+                            ArrayList<Integer> customerFlights = currentCustomer.getFlights();
+                            for (int i = 0; i < customerFlights.size(); i++) {
+                                flight temp = mySingleton.getFlightByFlightNo(customerFlights.get(i));
+                                String[] seats = temp.getFlightSeats();
+                                for (int j = 0; j < seats.length; j++) {
+                                    if (seats[j].equals(tempCustomer.getPhoneNumber())) {
+                                        seats[j] = phoneNumber.getText();
+                                    }
+                                }
+                            }
+                            mySingleton.flightWriter();
                             tempCustomer.setPhoneNumber(phoneNumber.getText());
                         }
                         if (flag) {
@@ -1124,7 +1137,7 @@ public class op {
                             AccountSettingsFrame.dispose();
                             frame.setEnabled(true);
                             mySingleton.customerWriter();
-                            JOptionPane.showMessageDialog(null, tempCustomer.getName()+" deleted", "Success",
+                            JOptionPane.showMessageDialog(null, tempCustomer.getName() + " deleted", "Success",
                                     JOptionPane.INFORMATION_MESSAGE);
                         }
                     }
@@ -1156,12 +1169,11 @@ public class op {
                 JLabel flightNumberLabel = new JLabel("Enter User Data");
                 flightNumberLabel.setBounds(55, 91, 188, 20);
                 removeUserFrame.getContentPane().add(flightNumberLabel);
-                
+
                 JTextField flightNumber = new JTextField();
                 flightNumber.setBounds(192, 88, 146, 26);
                 removeUserFrame.getContentPane().add(flightNumber);
                 flightNumber.setColumns(10);
-
 
                 JButton removeUserBut = new JButton("Remove User");
                 removeUserBut.setBounds(192, 364, 130, 29);
@@ -1171,41 +1183,42 @@ public class op {
                 // When the removeUser button is clicked
                 removeUserBut.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                    	JFrame removeFrame = new JFrame("Remove");
-                    	removeFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                    	removeFrame.setSize(500, 600);
-                    	removeFrame.setLocation(800, 200);
-                    	removeFrame.getContentPane().setLayout(null);
-                    	removeFrame.setResizable(false);
-                    	removeFrame.setVisible(true);
-                    	int idx=mySingleton.isCustomer(flightNumber.getText());
-                    	if(idx==-1) {
-                    		JOptionPane.showMessageDialog(null, flightNumber.getText()+ " Couldn't found","Error", JOptionPane.ERROR_MESSAGE);
-                    	}
-                    	else {
-                    		customer temp=mySingleton.getCustomerByIndex(idx);
-                    		ArrayList<Integer> userFlight=temp.getFlights();
-                    		for (int i = 0; i < userFlight.size(); i++) {
-								flight flg=mySingleton.getFlightByFlightNo(userFlight.get(i));
-								String [] seat=flg.getFlightSeats();
-								for (int j = 0; j < seat.length; j++) {
-									if(seat[j].equals(temp.getPhoneNumber())) {
-										flg.setAvailableSeats(flg.getAvailableSeats()+1);
-										seat[j]="-1";
-										flg.setFlightSeats(seat);
-										
-										break;
-									}
-								}
-							}
-                    		mySingleton.removeCustomer(temp);
-                    		mySingleton.flightWriter();
-							mySingleton.customerWriter();
-							JOptionPane.showMessageDialog(null, temp.getName()+" was deleted","Error", JOptionPane.ERROR_MESSAGE);
-                    	}
-                    	removeFrame.dispose();
-                    	removeUserFrame.dispose();
-                    	frame.setEnabled(true);
+                        JFrame removeFrame = new JFrame("Remove");
+                        removeFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                        removeFrame.setSize(500, 600);
+                        removeFrame.setLocation(800, 200);
+                        removeFrame.getContentPane().setLayout(null);
+                        removeFrame.setResizable(false);
+                        removeFrame.setVisible(true);
+                        int idx = mySingleton.isCustomer(flightNumber.getText());
+                        if (idx == -1) {
+                            JOptionPane.showMessageDialog(null, flightNumber.getText() + " Couldn't found", "Error",
+                                    JOptionPane.ERROR_MESSAGE);
+                        } else {
+                            customer temp = mySingleton.getCustomerByIndex(idx);
+                            ArrayList<Integer> userFlight = temp.getFlights();
+                            for (int i = 0; i < userFlight.size(); i++) {
+                                flight flg = mySingleton.getFlightByFlightNo(userFlight.get(i));
+                                String[] seat = flg.getFlightSeats();
+                                for (int j = 0; j < seat.length; j++) {
+                                    if (seat[j].equals(temp.getPhoneNumber())) {
+                                        flg.setAvailableSeats(flg.getAvailableSeats() + 1);
+                                        seat[j] = "-1";
+                                        flg.setFlightSeats(seat);
+
+                                        break;
+                                    }
+                                }
+                            }
+                            mySingleton.removeCustomer(temp);
+                            mySingleton.flightWriter();
+                            mySingleton.customerWriter();
+                            JOptionPane.showMessageDialog(null, temp.getName() + " was deleted", "Error",
+                                    JOptionPane.ERROR_MESSAGE);
+                        }
+                        removeFrame.dispose();
+                        removeUserFrame.dispose();
+                        frame.setEnabled(true);
                     }
                 });
 
@@ -1222,6 +1235,81 @@ public class op {
 
             }
         });
+        removeFlight.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+                frame.setEnabled(false);
+
+                JFrame removeFlightFrame = new JFrame("Remove Flight");
+                removeFlightFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                removeFlightFrame.setSize(500, 600);
+                removeFlightFrame.setLocation(800, 200);
+                removeFlightFrame.getContentPane().setLayout(null);
+                removeFlightFrame.setResizable(false);
+                removeFlightFrame.setVisible(true);
+
+                JLabel flightNumberLabel = new JLabel("Enter Flight Number");
+                flightNumberLabel.setBounds(55, 91, 188, 20);
+                removeFlightFrame.getContentPane().add(flightNumberLabel);
+
+                JTextField flightNumber = new JTextField();
+                flightNumber.setBounds(192, 88, 146, 26);
+                removeFlightFrame.getContentPane().add(flightNumber);
+                flightNumber.setColumns(10);
+
+                JButton removeFlightButton = new JButton("Remove Flight");
+                removeFlightButton.setBounds(192, 364, 130, 29);
+                removeFlightFrame.getContentPane().add(removeFlightButton);
+
+                // When the removeFlight button is clicked
+
+                // removeFlightButton
+                removeFlightButton.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+
+                        int flightNo = Integer.parseInt(flightNumber.getText());
+
+                        if (mySingleton.getFlightByFlightNo(flightNo) != null) {
+
+                            
+                            //removing flight from customers
+                            ArrayList<customer> customers = mySingleton.getCustomers();
+                            ArrayList<flight> flights = mySingleton.getFlights();
+                            //customer seat dolaş -1 ise pas geç 0 
+                            //numarası eşitse gez 
+                            my
+
+                            for (flight fli : customers) {
+                                    
+                                ArrayList<Integer> flights = customer.getFlights();
+                                for (int i = 0; i < flights.size(); i++) {
+                                    if (flights.get(i) == flightNo) {
+                                        flights.remove(i);
+                                        break;
+                                    }
+                                }
+                                customer.setFlights(flights);
+                            }
+                            mySingleton.removeFlight(mySingleton.getFlightByFlightNo(flightNo));
+                            
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Flight couldn't found", "Error",
+                                    JOptionPane.ERROR_MESSAGE);
+                        }
+                        removeFlightFrame.dispose();
+                        frame.setEnabled(true);
+
+                        removeFlightFrame.addWindowListener(new java.awt.event.WindowAdapter() {
+                            @Override
+                            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                                frame.setEnabled(true);
+                            }
+                        });
+                    }
+                });
+            }
+        });
+
     }
 
     // Menus
