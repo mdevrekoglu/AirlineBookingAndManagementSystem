@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-public class MySingleton {
+public class MySingleton implements MySingletonInterface{
 
     private static MySingleton instance = null;
     private ArrayList<customer> customers;
@@ -249,4 +249,5 @@ public class MySingleton {
             System.exit(0);
         }
     }
+
 }

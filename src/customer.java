@@ -75,4 +75,12 @@ public class customer implements customerInterface{
     public void setFlights(ArrayList<Integer> flights){
         this.flights = flights;
     }
+
+    public void addFlight(int flightID){
+        flights.add(flightID);
+    }
+
+    public void removeFlight(int flightID){
+        flights.remove(flightID);
+    }
 }

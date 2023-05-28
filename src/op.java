@@ -1269,28 +1269,25 @@ public class op {
 
                         int flightNo = Integer.parseInt(flightNumber.getText());
 
-                        if (mySingleton.getFlightByFlightNo(flightNo) != null) {
+                        if (flightNo != -1) {
 
                             
                             //removing flight from customers
-                            ArrayList<customer> customers = mySingleton.getCustomers();
-                            ArrayList<flight> flights = mySingleton.getFlights();
-                            //customer seat dolaş -1 ise pas geç 0 
-                            //numarası eşitse gez 
-                            my
+                            flight flight = mySingleton.getFlightByFlightNo(flightNo);
 
-                            for (flight fli : customers) {
-                                    
-                                ArrayList<Integer> flights = customer.getFlights();
-                                for (int i = 0; i < flights.size(); i++) {
-                                    if (flights.get(i) == flightNo) {
-                                        flights.remove(i);
-                                        break;
-                                    }
+                            String[] seats = flight.getFlightSeats();
+
+                            for (String string : seats) {
+                                int index = mySingleton.isCustomer(string);
+                                if (index != -1) {
+                                    customer customer = mySingleton.getCustomerByIndex(index);
+                                    customer.removeFlight(flightNo);
                                 }
-                                customer.setFlights(flights);
                             }
+
                             mySingleton.removeFlight(mySingleton.getFlightByFlightNo(flightNo));
+                            mySingleton.flightWriter();
+                            mySingleton.customerWriter();
                             
                         } else {
                             JOptionPane.showMessageDialog(null, "Flight couldn't found", "Error",
