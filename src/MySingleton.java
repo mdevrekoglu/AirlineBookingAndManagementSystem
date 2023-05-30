@@ -68,6 +68,9 @@ public class MySingleton implements MySingletonInterface{
         customers.remove(customer);
         customerWriter();
     }
+    public void updateCustomer(customer customer){
+        customerWriter();
+    }
 
     public void addFlight(flight flight){
         flights.add(flight);

@@ -2,8 +2,14 @@
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -461,19 +467,8 @@ public class op {
                 scheduleFlightFrame.getContentPane().add(price);
                 price.setColumns(10);
 
-                // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                JLabel capacityLabel = new JLabel("Capacity");
-                capacityLabel.setBounds(55, 317, 85, 20);
-                scheduleFlightFrame.getContentPane().add(capacityLabel);
-                scheduleFlightFrame.setVisible(true);
-
-                JTextField capacity = new JTextField();
-                capacity.setBounds(192, 314, 146, 26);
-                scheduleFlightFrame.getContentPane().add(capacity);
-                capacity.setColumns(10);
-
                 JButton addFlight = new JButton("Add Flight");
-                addFlight.setBounds(192, 364, 130, 29);
+                addFlight.setBounds(192, 317, 130, 29);
                 scheduleFlightFrame.getContentPane().add(addFlight);
                 addFlight.setVisible(true);
 
@@ -486,7 +481,7 @@ public class op {
 
                         if (flightNumber.getText().equals("") || destination.getText().equals("")
                                 || date.getText().equals("") || time.getText().equals("")
-                                || price.getText().equals("") || capacity.getText().equals("")) {
+                                || price.getText().equals("") ) {
                             flag = true;
                             total_error += "Please fill all the fields!\n";
                         }
@@ -497,28 +492,46 @@ public class op {
                         }
 
                         if (!destination.getText().contains("-")) {
-                            total_error += "Destination must be filled From-To !\n";
+                            String []parts=destination.getText().split("-");
+                            if(parts[0]==parts[1]){
+                                total_error += "Destination must be different!\n";
+                                flag = true;
+                            }
+                            if(parts[0].equals("") || parts[1].equals("")){
+                                total_error += "Destination must be filled!\n";
+                                flag = true;
+                            }
+                        }
+                        LocalDate currenDate = LocalDate.now();
+                        LocalDate inputDate=LocalDate.parse(date.getText().toString(), DateTimeFormatter.ISO_DATE);
+                        if(inputDate.isBefore(currenDate))
+                        {
+                            total_error += "Date must be after current date!\n";
                             flag = true;
                         }
                         if (!date.getText().matches("\\d{4}-\\d{2}-\\d{2}")
-                                && !date.getText().startsWith("[0-9]{4}-[0-9]{2}-[0-9]{2}")) {
-                            total_error += "Date must be filled YYYY-MM-DD !\n";
-                            flag = true;
+                                && !date.getText().startsWith("[0-9]{4}-[0-9]{2}-[0-9]{2}")&&inputDate.isBefore(currenDate)) {
+                                    
+                                                        
+                                        total_error += "Date must be filled YYYY-MM-DD !\n";
+                                        flag = true;
+                                    
                         }
-                        if (!time.getText().equals("\\d{2}:\\d{2}")
+                        if (!time.getText().matches("\\d{2}:\\d{2}")
                                 || !time.getText().contains(":")) {
-                            total_error += "Time must be filled HH:MM !\n";
-                            flag = true;
+                                    String[] parts = time.getText().split(":");
+                                   
+
+                                    if(Integer.parseInt(parts[0]) > 23 || Integer.parseInt(parts[1]) > 59|| Integer.parseInt(parts[0]) < 0 || Integer.parseInt(parts[1]) < 0){
+                                        total_error += "Time must be filled HH:MM !\n";
+                                        flag = true;
+                                    }
                         }
                         if (!price.getText().matches("[0-9]+")) {
                             total_error += "Price must be contains only positive integer!\n";
                             flag = true;
                         }
-                        if (!capacity.getText().matches("[0-9]+")) {
-                            total_error += "Capacity must be contains only positive integer!\n";
-                            flag = true;
-                        }
-
+                        
                         try {
                             if (!flag && (mySingleton.isFlight(Integer.parseInt(flightNumber.getText()))) != -1) {
                                 JOptionPane.showMessageDialog(null, "Flight number already exists!", "Error",
@@ -539,8 +552,11 @@ public class op {
                         } else {
 
                             String parts = date.getText() + "T" + time.getText();
-                            int availableSeats = capacity.getText().length();
-                            String flightSeats[] = new String[capacity.getText().length()];
+                            int availableSeats =120;
+                            String flightSeats[] =new String[120];
+                            for(int i=0;i<120;i++){
+                                flightSeats[i]="-1";
+                            }
                             mySingleton.addFlight(
                                     new flight(Integer.parseInt(flightNumber.getText()), destination.getText(), parts,
                                             Integer.parseInt(price.getText()), availableSeats, flightSeats));
@@ -788,19 +804,6 @@ public class op {
                         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                         flight currentFlight = mySingleton.getFlightByFlightNo(flightNo);
                         String[] seatArray = currentFlight.getFlightSeats();
-
-                        /*
-                         * for (int j = 1; j < allFlights.size(); j++) {
-                         * if(allFlights.get(j).getFlightNo()==flightNo) {
-                         * flight currentFlight=allFlights.get(j);
-                         * System.out.println(allFlights.get(j).getFlightSeats().length);
-                         * seatArray=allFlights.get(j).getFlightSeats();
-                         * break;
-                         * }
-                         * }
-                         */
-                        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BACK BUTTON!!!!!!!!!!!!!!!!!!!
-
                         JButton[] buttons = new JButton[121];
                         int x = 100;
                         int y = 20;
@@ -921,7 +924,6 @@ public class op {
                     if (mySingleton.getFlightByFlightNo(flightNo) != null) {
                         fromto[i] = mySingleton.getFlightByFlightNo(flightNo).getFlightDestination();
                         temp[i] = mySingleton.getFlightByFlightNo(flightNo).getFlightDateTimeString();
-                        System.out.println(temp);
                         i++;
                     }
                 }
@@ -933,19 +935,51 @@ public class op {
                 }
 
                 MyScheduleTable.setModel(new DefaultTableModel(data, columnNames));
-                MyScheduleTable.setDefaultEditor(getClass(), null);
-                MyScheduleTable.setEnabled(false); // to disable table editing
+                MyScheduleTable.setDefaultEditor(Object.class, null);//disable editing 
+               // MyScheduleTable.setResizable(false);
+                //how to enable editing only 1 column
                 MyScheduleTable.getColumnModel().getColumn(0).setResizable(false);
                 MyScheduleTable.getColumnModel().getColumn(0).setPreferredWidth(50);
                 MyScheduleTable.getColumnModel().getColumn(1).setPreferredWidth(200);
                 MyScheduleTable.getColumnModel().getColumn(2).setResizable(false);
                 MyScheduleTable.getColumnModel().getColumn(2).setPreferredWidth(100);
-
+                scrollPane.setViewportView(MyScheduleTable);
+                MyScheduleTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+                MyScheduleTable.setRowSelectionAllowed(true);
                 MyScheduleFrame.setVisible(true);
 
-                DefaultTableModel modeloo = new DefaultTableModel(data, columnNames);
 
-                MyScheduleTable = new JTable(modeloo);
+                JButton cancelticket= new JButton("Cancel Ticket");
+                cancelticket.setBounds(180, 500, 120, 30);
+                MyScheduleFrame.getContentPane().add(cancelticket);
+
+                cancelticket.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        int row = MyScheduleTable.getSelectedRow();
+                        int flightNo = Integer.parseInt((String) MyScheduleTable.getValueAt(row, 0));
+                        mySingleton.getFlightByFlightNo(flightNo).setAvailableSeats(mySingleton.getFlightByFlightNo(flightNo).getAvailableSeats() + 1);
+                        
+                        flight flight = mySingleton.getFlightByFlightNo(flightNo);
+                        String[] seats = flight.getFlightSeats();
+                        
+                        for (int j = 0; j < seats.length; j++) {
+                            int index=mySingleton.isCustomer(seats[j]);
+                            if(!seats[j].equals("-1")&&index!=-1)
+                            {
+                                customer customer = mySingleton.getCustomerByIndex(index);
+                                customer.removeFlight(flightNo);
+                                seats[j]="-1";
+                                flight.setAvailableSeats(flight.getAvailableSeats() + 1);
+                            }
+                            
+                        }
+                        flight.setFlightSeats(seats);
+                        mySingleton.flightWriter();
+                        mySingleton.updateCustomer(currentCustomer);
+                        MyScheduleFrame.dispose();
+                        frame.setEnabled(true);
+                    }
+                });
 
             }
         });
@@ -1282,8 +1316,10 @@ public class op {
                                 if (index != -1) {
                                     customer customer = mySingleton.getCustomerByIndex(index);
                                     customer.removeFlight(flightNo);
+                                    mySingleton.updateCustomer(customer);
                                 }
                             }
+                            
 
                             mySingleton.removeFlight(mySingleton.getFlightByFlightNo(flightNo));
                             mySingleton.flightWriter();
