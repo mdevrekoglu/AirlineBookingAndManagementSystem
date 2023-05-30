@@ -1304,7 +1304,14 @@ public class op {
                 removeFlightButton.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
 
-                        int flightNo = Integer.parseInt(flightNumber.getText());
+                        int flightNo;
+
+                        try {
+                            flightNo = Integer.parseInt(flightNumber.getText());
+                        } catch (Exception e1) {
+                            System.out.println(e1);
+                            flightNo = -1;
+                        }
 
                         if (flightNo != -1) {
 
