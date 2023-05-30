@@ -68,12 +68,22 @@ public class MySingleton implements MySingletonInterface{
         customers.remove(customer);
         customerWriter();
     }
+    
     public void updateCustomer(customer customer){
         customerWriter();
     }
 
     public void addFlight(flight flight){
         flights.add(flight);
+        
+        // Sort flights by date
+        Collections.sort(flights, new Comparator<flight>() {
+            @Override
+            public int compare(flight f1, flight f2) {
+                return f1.getFlightDateTime().compareTo(f2.getFlightDateTime());
+            }
+        });
+
         flightWriter();
     }
 
@@ -160,7 +170,7 @@ public class MySingleton implements MySingletonInterface{
 
             reader.close();
         } catch (Exception e1) {
-            // TODO Auto-generated catch block
+
             e1.printStackTrace();
             System.exit(0);
         }
@@ -213,7 +223,7 @@ public class MySingleton implements MySingletonInterface{
 
             reader.close();
         } catch (Exception e1) {
-            // TODO Auto-generated catch block
+
             e1.printStackTrace();
             System.exit(0);
         }finally{

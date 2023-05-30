@@ -12,7 +12,7 @@ destinations = ["Tokyo", "Delhi", "Shanghai", "Sao Paulo", "Mumbai", "Mexico Cit
 "Tangshan", "Khartoum North", "Baghdad", "Ankara", "Sydney", "Addis Ababa", "Surat", "Santiago", "Nairobi", "Melbourne", 
 "Jeddah", "Monterrey", "Phoenix", "Brasilia", "Durban", "Lucknow", "San Francisco", "Izmir", "Mashhad", "Kanpur", 
 "Ludhiana", "Zibo", "Kampala", "Surabaya", "Milan", "Kananga", "Caracas", "Urumqi", "Giza", "Mandalay", "Accra", 
-"Izmit", "Manhattan", "Kobe", "Lanzhou", "La Paz", "Patna", "Baku", "Kumasi", "Mbuji-Mayi", "Kaohsiung", "Varanasi", 
+"Izmit", "Manhattan", "Kobe", "Lanzhou", "La Paz", "Patna", "Baku", "Kumasi", "Mbuji Mayi", "Kaohsiung", "Varanasi", 
 "Kaduna", "Santo Domingo", "Valencia", "Taichung", "Brisbane", "Vancouver", "Yerevan", "Tunis", "Asuncion", "Tabriz", 
 "Bishkek", "Kyoto", "Cape Town", "Port Harcourt", "Faisalabad", "Haifa", 
 "Jerusalem", "Almaty", "San Diego", "Jinan", "Kochi", "Hefei", "Taizhou, Zhejiang", "Tijuana", "Vadodara", "Bandung", 
@@ -46,8 +46,8 @@ for i in range(10000):
     flying_minutes = random.randint(0, 59)
     flying_time = f"{flying_hours:02d}:{flying_minutes:02d}"
     
-    # Generate a random price between 50 and 500
-    price = random.randint(50, 500)
+    # Generate a random price between 500 and 2500
+    price = random.randint(500, 2500)
     
     # Generate a random number of available seats between 50 and 200
     available_seats = 120
