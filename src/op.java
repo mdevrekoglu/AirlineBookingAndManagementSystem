@@ -486,14 +486,14 @@ public class op {
                             flag = true;
                         }
 
-                        if (!destination.getText().contains("-")) {
+
+                        if (destination.getText().contains("-")) {
                             String[] parts = destination.getText().split("-");
-                            if (parts[0] == parts[1]) {
-                                total_error += "Destination must be different!\n";
+                            if(parts.length != 2){
+                                total_error += "Destination must be filled like XXX-XXX!\n";
                                 flag = true;
-                            }
-                            if (parts[0].equals("") || parts[1].equals("")) {
-                                total_error += "Destination must be filled!\n";
+                            }else if (parts[0].equals(parts[1])) {
+                                total_error += "Destination must be different!\n";
                                 flag = true;
                             }
                         }
@@ -512,20 +512,34 @@ public class op {
                         }
 
 
-                        if (!time.getText().matches("\\d{2}:\\d{2}")
-                                || !time.getText().contains(":")) {
-                            String[] parts = time.getText().split(":");
+                        if(time.getText().length() != 5 || !time.getText().contains(":")){
+                            total_error += "Time must be filled HH:MM!\n";
+                            flag = true;
+                        }else{
 
-                            if (Integer.parseInt(parts[0]) > 23 || Integer.parseInt(parts[1]) > 59
-                                    || Integer.parseInt(parts[0]) < 0 || Integer.parseInt(parts[1]) < 0) {
-                                total_error += "Time must be filled HH:MM !\n";
-                                flag = true;
+                            try {
+                                String[] parts = time.getText().split(":");
+                                if(Integer.parseInt(parts[0]) > 23 || Integer.parseInt(parts[1]) > 59 
+                                || Integer.parseInt(parts[0]) < 0 || Integer.parseInt(parts[1]) < 0){
+                                    total_error += "Time must be filled HH:MM!\n";
+                                    flag = true;
+                                }
+                            } catch (Exception e1) {
+                                System.out.println(e1);
                             }
                         }
+                        
 
-                        if (!price.getText().matches("[0-9]+")) {
-                            total_error += "Price must be contains only positive integer!\n";
+                        try {
+                            int priceInt = Integer.parseInt(price.getText());
+                            if (priceInt < 0) {
+                                total_error += "Price must be positive!\n";
+                                flag = true;
+                            }
+                        } catch (Exception e1) {
+                            total_error += "Price must be integer!\n";
                             flag = true;
+                           System.out.println(e1);
                         }
 
                         try {
@@ -536,7 +550,6 @@ public class op {
                             }
                         } catch (Exception e1) {
                             flag = true;
-
                             System.out.println(e1);
                         }
 
